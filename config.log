@@ -1,0 +1,1186 @@
+file /home/markpovlsen/Documents/iotivity-1.1.0/build_common/SConscript,line 408:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for POSIX Thread Support...
+scons: Configure: ".sconf_temp/conftest_0.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_0.c <-
+  |  |
+  |  |#if !defined(__GNUC__)
+  |  |#  error "Not the GCC C compiler."
+  |  |#endif
+  |  |
+  |  |int foo(void)
+  |  |{
+  |  |    return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_0.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_0.o
+  |
+scons: Configure: ".sconf_temp/conftest_1.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_1.c <-
+  |  |
+  |  |#include <unistd.h>
+  |  |#include <pthread.h>
+  |  |int main()
+  |  |{
+  |  |    #ifndef _POSIX_THREADS
+  |  |    # error POSIX Threads support not available
+  |  |    #endif
+  |  |    return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_1.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_1.o
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/resource/third_party_libs.scons,line 49:
+	Configure(confdir = .sconf_temp)
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/resource/third_party_libs.scons,line 49:
+	Configure(confdir = .sconf_temp)
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/resource/third_party_libs.scons,line 49:
+	Configure(confdir = .sconf_temp)
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/resource/third_party_libs.scons,line 49:
+	Configure(confdir = .sconf_temp)
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/resource/third_party_libs.scons,line 49:
+	Configure(confdir = .sconf_temp)
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/resource/third_party_libs.scons,line 49:
+	Configure(confdir = .sconf_temp)
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/resource/third_party_libs.scons,line 49:
+	Configure(confdir = .sconf_temp)
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_2.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_2.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_2.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_2.o
+  |
+scons: Configure: "out/linux/x86_64/release/resource/c_common/oic_string/src/oic_string.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling out/linux/x86_64/release/resource/c_common/oic_string/src/oic_string.o
+  |
+scons: Configure: "out/linux/x86_64/release/resource/c_common/oic_malloc/src/oic_malloc.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling out/linux/x86_64/release/resource/c_common/oic_malloc/src/oic_malloc.o
+  |
+scons: Configure: "out/linux/x86_64/release/resource/c_common/oic_time/src/oic_time.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling out/linux/x86_64/release/resource/c_common/oic_time/src/oic_time.o
+  |
+scons: Configure: "out/linux/x86_64/release/resource/c_common/ocrandom/src/ocrandom.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling out/linux/x86_64/release/resource/c_common/ocrandom/src/ocrandom.o
+  |
+scons: Configure: "out/linux/x86_64/release/resource/c_common/libc_common.a" is up to date.
+scons: Configure: The original builder output was:
+  |Archiving out/linux/x86_64/release/resource/c_common/libc_common.a
+  |Indexing Archive out/linux/x86_64/release/resource/c_common/libc_common.a
+  |
+scons: Configure: "out/linux/x86_64/release/resource/csdk/logger/src/logger.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling out/linux/x86_64/release/resource/csdk/logger/src/logger.o
+  |
+scons: Configure: "out/linux/x86_64/release/resource/csdk/logger/liblogger.a" is up to date.
+scons: Configure: The original builder output was:
+  |Archiving out/linux/x86_64/release/resource/csdk/logger/liblogger.a
+  |Indexing Archive out/linux/x86_64/release/resource/csdk/logger/liblogger.a
+  |
+scons: Configure: "out/linux/x86_64/release/resource/csdk/routing/src/routingutility.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling out/linux/x86_64/release/resource/csdk/routing/src/routingutility.o
+  |
+scons: Configure: "out/linux/x86_64/release/resource/csdk/routing/libroutingmanager.a" is up to date.
+scons: Configure: The original builder output was:
+  |Archiving out/linux/x86_64/release/resource/csdk/routing/libroutingmanager.a
+  |Indexing Archive out/linux/x86_64/release/resource/csdk/routing/libroutingmanager.a
+  |
+scons: Configure: ".sconf_temp/conftest_2" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_2
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_3.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_3.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_3.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_3.o
+  |
+scons: Configure: ".sconf_temp/conftest_3" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_3
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_4.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_4.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_4.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_4.o
+  |
+scons: Configure: ".sconf_temp/conftest_4" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_4
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_5.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_5.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_5.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_5.o
+  |
+scons: Configure: ".sconf_temp/conftest_5" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_5
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_6.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_6.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_6.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_6.o
+  |
+scons: Configure: ".sconf_temp/conftest_6" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_6
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_7.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_7.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_7.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_7.o
+  |
+scons: Configure: ".sconf_temp/conftest_7" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_7
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_8.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_8.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_8.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_8.o
+  |
+scons: Configure: ".sconf_temp/conftest_8" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_8
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_9.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_9.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_9.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_9.o
+  |
+scons: Configure: ".sconf_temp/conftest_9" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_9
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_10.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_10.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_10.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_10.o
+  |
+scons: Configure: ".sconf_temp/conftest_10" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_10
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_11.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_11.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_11.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_11.o
+  |
+scons: Configure: ".sconf_temp/conftest_11" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_11
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_12.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_12.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_12.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_12.o
+  |
+scons: Configure: ".sconf_temp/conftest_12" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_12
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_13.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_13.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_13.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_13.o
+  |
+scons: Configure: ".sconf_temp/conftest_13" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_13
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_14.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_14.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_14.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_14.o
+  |
+scons: Configure: ".sconf_temp/conftest_14" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_14
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_15.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_15.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_15.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_15.o
+  |
+scons: Configure: ".sconf_temp/conftest_15" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_15
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_16.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_16.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_16.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_16.o
+  |
+scons: Configure: ".sconf_temp/conftest_16" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_16
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_17.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_17.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_17.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_17.o
+  |
+scons: Configure: ".sconf_temp/conftest_17" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_17
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_18.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_18.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_18.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_18.o
+  |
+scons: Configure: ".sconf_temp/conftest_18" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_18
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_19.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_19.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_19.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_19.o
+  |
+scons: Configure: ".sconf_temp/conftest_19" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_19
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_20.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_20.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_20.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_20.o
+  |
+scons: Configure: ".sconf_temp/conftest_20" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_20
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_21.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_21.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_21.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_21.o
+  |
+scons: Configure: ".sconf_temp/conftest_21" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_21
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_22.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_22.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_22.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_22.o
+  |
+scons: Configure: ".sconf_temp/conftest_22" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_22
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_23.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_23.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_23.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_23.o
+  |
+scons: Configure: ".sconf_temp/conftest_23" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_23
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_24.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_24.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_24.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_24.o
+  |
+scons: Configure: ".sconf_temp/conftest_24" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_24
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_25.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_25.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_25.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_25.o
+  |
+scons: Configure: ".sconf_temp/conftest_25" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_25
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_26.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_26.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_26.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_26.o
+  |
+scons: Configure: ".sconf_temp/conftest_26" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_26
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_27.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_27.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_27.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_27.o
+  |
+scons: Configure: ".sconf_temp/conftest_27" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_27
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_28.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_28.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_28.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_28.o
+  |
+scons: Configure: ".sconf_temp/conftest_28" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_28
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_29.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_29.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_29.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_29.o
+  |
+scons: Configure: ".sconf_temp/conftest_29" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_29
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_30.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_30.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_30.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_30.o
+  |
+scons: Configure: ".sconf_temp/conftest_30" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_30
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_31.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_31.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_31.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_31.o
+  |
+scons: Configure: ".sconf_temp/conftest_31" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_31
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_32.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_32.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_32.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_32.o
+  |
+scons: Configure: ".sconf_temp/conftest_32" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_32
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_33.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_33.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_33.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_33.o
+  |
+scons: Configure: ".sconf_temp/conftest_33" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_33
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_34.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_34.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_34.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_34.o
+  |
+scons: Configure: ".sconf_temp/conftest_34" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_34
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_35.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_35.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_35.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_35.o
+  |
+scons: Configure: ".sconf_temp/conftest_35" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_35
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_36.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_36.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_36.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_36.o
+  |
+scons: Configure: ".sconf_temp/conftest_36" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_36
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_37.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_37.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_37.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_37.o
+  |
+scons: Configure: ".sconf_temp/conftest_37" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_37
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_38.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_38.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_38.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_38.o
+  |
+scons: Configure: ".sconf_temp/conftest_38" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_38
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_39.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_39.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_39.o" is up to date.
+scons: Configure: The original builder output was:
+  |Compiling .sconf_temp/conftest_39.o
+  |
+scons: Configure: ".sconf_temp/conftest_39" is up to date.
+scons: Configure: The original builder output was:
+  |Linking .sconf_temp/conftest_39
+  |
+scons: Configure: (cached) yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+.sconf_temp/conftest_40.cpp <-
+  |
+  |
+  |
+  |int
+  |main() {
+  |  
+  |return 0;
+  |}
+  |
+Compiling .sconf_temp/conftest_40.o
+Linking .sconf_temp/conftest_40
+scons: Configure: yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_41.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_41.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+Compiling .sconf_temp/conftest_41.o
+Linking .sconf_temp/conftest_41
+scons: Configure: yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_42.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_42.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+Compiling .sconf_temp/conftest_42.o
+Linking .sconf_temp/conftest_42
+scons: Configure: yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_43.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_43.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+Compiling .sconf_temp/conftest_43.o
+Linking .sconf_temp/conftest_43
+scons: Configure: yes
+
+
+file /home/markpovlsen/Documents/iotivity-1.1.0/service/third_party_libs.scons,line 50:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_44.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_44.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+Compiling .sconf_temp/conftest_44.o
+Linking .sconf_temp/conftest_44
+scons: Configure: yes
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_45.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_45.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+Compiling .sconf_temp/conftest_45.o
+Linking .sconf_temp/conftest_45
+scons: Configure: yes
+
+

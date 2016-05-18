@@ -1,0 +1,118 @@
+Import('env')
+
+if env.get('RELEASE'):
+	env.AppendUnique(CCFLAGS = ['-Os'])
+	env.AppendUnique(CPPDEFINES = ['NDEBUG'])
+else:
+	env.AppendUnique(CCFLAGS = ['-g'])
+	env.AppendUnique(CPPDEFINES = ['DEBUG'])
+
+lib_env = env.Clone()
+SConscript(env.get('SRC_DIR') + '/service/third_party_libs.scons', 'lib_env')
+rpi_env = lib_env.Clone()
+
+target_os = env.get('TARGET_OS')
+target_arch = env.get('TARGET_ARCH')
+
+######################################################################
+# Build flags
+######################################################################
+rpi_env.AppendUnique(CPPPATH = ['../include'])
+rpi_env.AppendUnique(CPPPATH = ['../../resource/include'])
+rpi_env.AppendUnique(CPPPATH = ['../../resource/csdk/stack/include'])
+
+# Services
+rpi_env.AppendUnique(CPPPATH = ['../../service/resource-encapsulation/include'])
+rpi_env.AppendUnique(CPPPATH = ['../../service/resource-encapsulation/src/common/primitiveResource/include'])
+rpi_env.AppendUnique(CPPPATH = ['../../service/resource-encapsulation/src/common/expiryTime/include'])
+rpi_env.AppendUnique(CPPPATH = ['../../service/resource-directory/include'])
+rpi_env.AppendUnique(CPPPATH = ['../../service/controller/include'])
+rpi_env.AppendUnique(CPPPATH = ['../../service/resource-directory/include'])
+
+
+	
+
+if target_arch in 'ARM':
+	rpi_env.AppendUnique(LIBS = [
+		'rcs_client',
+		'rcs_server',
+		'rcs_common',
+		'oc',
+		'octbstack',
+		'oc_logger',
+		'connectivity_abstraction',
+		'libcoap',
+		'resource_directory',
+		'libcontroller',		# Has the configuration files
+		'librpi',
+		'wiringPi',
+		'resource_directory'
+		])
+else:
+	rpi_env.AppendUnique(LIBS = [
+		'rcs_client',
+		'rcs_server',
+		'rcs_common',
+		'oc',
+		'octbstack',
+		'oc_logger',
+		'connectivity_abstraction',
+		'libcoap',
+		'resource_directory',
+		'libcontroller',		# Has the configuration files
+		'librpi',
+		'resource_directory'
+		])
+
+#rpi_env.PrependUnique(LIBS = 'resource_directory')
+
+if env.get('SECURED') == '1':
+    rpi_env.AppendUnique(LIBS = ['tinydtls'])
+if 'rt' in rpi_env.get('LIBS'):
+    rpi_env.Append(LIBS = ['rt'])
+
+if env.get('SECURED') == '1':
+    rpi_env.AppendUnique(LIBS = ['tinydtls'])
+if 'rt' in rpi_env.get('LIBS'):
+    rpi_env.Append(LIBS = ['rt'])
+
+if target_os not in ['windows', 'winrt']:
+	rpi_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-Wextra', '-fmessage-length=0', '-std=c++0x', '-Wno-error'])
+
+if target_os not in ['darwin', 'ios', 'windows', 'winrt']:
+	rpi_env.AppendUnique(LINKFLAGS = ['-Wl,--no-undefined'])
+
+if target_os == 'linux':
+	rpi_env.AppendUnique(LIBS = ['pthread'])
+
+if target_os == 'android':
+	rpi_env.AppendUnique(CXXFLAGS = ['-frtti', '-fexceptions'])
+	rpi_env.AppendUnique(LIBS = ['gnustl_shared','log'])
+
+	if not env.get('RELEASE'):
+		rpi_env.AppendUnique(LIBS = ['log'])
+
+if target_arch == 'arm':
+	rpi_env.AppendUnique(CPPDEFINES = ['ARM'])
+elif target_arch == 'x86_64':
+	rpi_env.AppendUnique(CPPDEFINES = ['x84'])
+
+
+
+######################################################################
+# Test Programs
+######################################################################
+RpiMain = rpi_env.Program('resource_test', 'resource_test.cpp')
+RpiMain = rpi_env.Program('controller', 'controller.cpp')
+RpiMain = rpi_env.Program('BootstrapServer', 'bootstrapserver.cpp')
+
+RpiMain = rpi_env.Program('TVResource', 'tvResource.cpp')
+RpiMain = rpi_env.Program('ButtonLightResource', 'ButtonLightResource.cpp')
+
+RpiMain = rpi_env.Program('LightResourceHosting', 'LightResourceHosting.cpp')
+
+
+rpi_env.InstallTarget(RpiMain, 'resource_test')
+
+
+

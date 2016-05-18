@@ -1,0 +1,95 @@
+#******************************************************************
+#
+# Copyright 2014 Intel Mobile Communications GmbH All Rights Reserved.
+#
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Import('env')
+
+transport = env.get('TARGET_TRANSPORT')
+
+arduino_simplecs_env = env.Clone()
+######################################################################
+# Build flags
+######################################################################
+
+if 'WIFI' in env.get('SHIELD'):
+	arduino_simplecs_env.PrependUnique(CPPPATH = [
+			'../resource/csdk/logger/include',
+			'../resource/csdk/stack/include',
+			'../resource/csdk/stack/include/internal',
+			'../resource/csdk/connectivity/api',
+			'../resource/oc_logger/include',
+			'../service/easy-setup/inc',
+			'../service/easy-setup/enrollee/arduino/wifi',
+			'../service/easy-setup/enrollee/inc',
+			'../service/easy-setup/enrollee/src'
+			])
+else:
+	arduino_simplecs_env.PrependUnique(CPPPATH = [
+			'../resource/csdk/logger/include',
+			'../resource/csdk/stack/include',
+			'../resource/csdk/stack/include/internal',
+			'../resource/csdk/connectivity/api',
+			'../resource/oc_logger/include',
+			'../service/easy-setup/inc',
+			'../service/easy-setup/enrollee/arduino/wifi',
+			'../service/easy-setup/enrollee/inc',
+			'../service/easy-setup/enrollee/src'
+			])
+
+print(env.get('ES_ROLE'))
+
+arduino_simplecs_env.AppendUnique(LIBPATH = [env.get('BUILD_DIR')])
+arduino_simplecs_env.AppendUnique(CPPDEFINES = ['TB_LOG'])
+
+if 'WIFI' in env.get('SHIELD'):
+	arduino_simplecs_env.PrependUnique(LIBS = ['octbstack', 'ocsrm', 'connectivity_abstraction', 'coap', 'ESEnrolleeSDK'])
+else:
+	arduino_simplecs_env.PrependUnique(LIBS = ['octbstack', 'ocsrm', 'connectivity_abstraction', 'coap'])
+
+if ('arduino_due_x' or 'arduino_due_x_dbg') in env.get('BOARD'):
+	arduino_simplecs = arduino_simplecs_env.Program('arduinoLightServer', 'lightServerEthernet.cpp',)
+if 'mega' in env.get('BOARD'):
+	print('MEGA temperature sensor')
+	arduino_simplecs = arduino_simplecs_env.Program('arduinoTemperatureServer', 'temperatureServer.cpp')
+env.CreateBin('arduinoLightServer')
+env.CreateBin('arduinoTemperatureServer')
+print('LOL')
+i_arduino_simplecs = arduino_simplecs_env.Install(env.get('BUILD_DIR'), arduino_simplecs)
+
+#The map file is intermediate file, make sure it's removed when clean build
+arduino_simplecs_env.Clean(arduino_simplecs, 'arduinoLightServer.map')
+arduino_simplecs_env.Clean(arduino_simplecs, 'arduinoTemperatureServer.map')
+
+Alias('arduino_simplecs', i_arduino_simplecs)
+arduino_simplecs_env.AppendTarget('arduino_simplecs')
+
+if 'arduino_due_x' in env.get('BOARD'):
+	arduino_simplecs_env.Default('arduinoLightServer.hex')
+if 'mega' in env.get('BOARD'):
+	arduino_simplecs_env.Default('arduinoTemperatureServer.hex')
+
+if(arduino_simplecs_env['UPLOAD'] == True):
+	from sys import platform as _platform
+	if _platform == "linux" or _platform == "linux2":
+		if 'arduino_due_x' in env.get('BOARD'):
+			arduino_simplecs_env.Upload(env.get('BUILD_DIR') + '/arduino_build/arduinoLightServer.hex')
+		if 'mega' in env.get('BOARD'):
+			arduino_simplecs_env.Upload(env.get('BUILD_DIR') + '/arduino_build/arduinoTemperatureServer.hex')
+	else:
+		print 'Please use appropriate install method for your developing machine. Linux is the only supported platform right now.'

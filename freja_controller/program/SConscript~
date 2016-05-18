@@ -1,0 +1,94 @@
+#******************************************************************
+#
+# Copyright 2015 Samsung Electronics All Rights Reserved.
+#
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+##
+# linux sample app  build script (Sample Client & Sample Server)
+##
+Import('env')
+
+# Add third party libraries
+lib_env = env.Clone()
+SConscript(env.get('SRC_DIR') + '/service/third_party_libs.scons', 'lib_env')
+
+controller_program_env = lib_env.Clone()
+
+######################################################################
+# Build flags
+######################################################################
+#controller_env.AppendUnique(CPPPATH = ['../../extlibs/cjson'])
+#controller_env.AppendUnique(CPPPATH = ['../../resource/csdk/connectivity/api
+controller_program_env.AppendUnique(CPPPATH = ['../include'])
+controller_program_env.AppendUnique(CPPPATH = ['../../service/resource-encapsulation/include'])
+controller_program_env.AppendUnique(CPPPATH = ['../../service/resource-encapsulation/src/common/primitiveResource/include'])
+controller_program_env.AppendUnique(CPPPATH = ['../../service/resource-encapsulation/src/common/expiryTimer/include'])
+controller_program_env.AppendUnique(CPPPATH = ['../../service/resource-hosting/src'])
+controller_program_env.AppendUnique(CPPPATH = ['../../service/scene-manager/include', '../scene_manager/src'])
+controller_program_env.AppendUnique(CPPPATH = ['../../resource/include'])
+controller_program_env.AppendUnique(CPPPATH = ['../../resource/csdk/stack/include']),
+controller_program_env.AppendUnique(CPPPATH = ['../../service/things-manager/sdk/inc']),
+controller_program_env.AppendUnique(CPPPATH = ['../../service/things-manager/sdk/src'])
+controller_program_env.AppendUnique(CPPPATH = ['../../service/things-manager/sdk/inc']),
+controller_program_env.AppendUnique(CPPPATH = ['../../service/things-manager/sampleapp/linux/configuration/'])
+controller_program_env.AppendUnique(CPPPATH = ['../../extlibs/timer'])
+controller_program_env.AppendUnique(CPPPATH = ['../../service/resource-hosting/include'])
+controller_program_env.AppendUnique(CPPPATH = ['../../service/resource-hosting/src'])
+
+# RD
+controller_program_env.AppendUnique(CPPPATH = ['../../service/resource-directory/include'])
+
+
+controller_program_env.AppendUnique(LIBS = [
+    'scene_manager',
+    'resource_hosting',
+    'rcs_client',
+    'rcs_server',
+    'controller',
+    'resource_directory',	
+    'rcs_common',
+    'oc',
+    'octbstack',
+    'oc_logger',
+    'connectivity_abstraction',
+    'coap',
+    'pthread',
+    'libTGMSDKLibrary',
+    'resource_hosting'
+    ])
+
+if env.get('SECURED') == '1':
+    controller_program_env.AppendUnique(LIBS = ['tinydtls'])
+
+if 'rt' in controller_program_env.get('LIBS'):
+    controller_program_env.Append(LIBS = ['rt'])
+
+controller_program_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-fmessage-length=0', '-std=c++0x', '-Wno-error'])
+
+######################################################################
+# ##### Client #####
+######################################################################
+
+ControllerMain = controller_program_env.Program('controller_main', 'main.cpp')
+ControllerMain = controller_program_env.Program('buttonServer', 'buttonserver.cpp')
+ControllerMain = controller_program_env.Program('lightServer', 'lightserver.cpp')
+ControllerMain = controller_program_env.Program('fanServer', 'fanserver.cpp')
+
+
+controller_program_env.InstallTarget(ControllerMain, 'controller_main')
+
