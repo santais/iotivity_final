@@ -31,7 +31,7 @@ liboc_logger_env = lib_env.Clone()
 ######################################################################
 # Build flags
 ######################################################################
-liboc_logger_env.PrependUnique(CPPPATH = ['include'])
+liboc_logger_env.PrependUnique(CPPPATH = ['include', '../../extlibs/boost/boost_1_55_0'])
 
 target_os = env.get('TARGET_OS')
 if target_os == 'android':

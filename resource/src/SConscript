@@ -38,7 +38,8 @@ oclib_env.AppendUnique(CPPPATH = [
 		'../csdk/logger/include',
 		'../oc_logger/include',
 		'../csdk/connectivity/lib/libcoap-4.1.1',
-		'../csdk/connectivity/api'
+		'../csdk/connectivity/api',
+		'../../extlibs/boost/boost_1_55_0'
 		])
 
 oclib_env.AppendUnique(LIBPATH = [env.get('BUILD_DIR')])
