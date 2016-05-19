@@ -73,7 +73,6 @@ controller_env.AppendUnique(LIBS = [
     'oc_logger',
     'connectivity_abstraction',
     'libcoap',
-    'libTGMSDKLibrary',
     'dl',
     'resource_hosting'
     ])

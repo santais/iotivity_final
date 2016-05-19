@@ -5,7 +5,6 @@ if env.get('RELEASE'):
 	env.AppendUnique(CPPDEFINES = ['NDEBUG'])
 else:
 	env.AppendUnique(CCFLAGS = ['-g'])
-	env.AppendUnique(CPPDEFINES = ['DEBUG'])
 
 lib_env = env.Clone()
 SConscript(env.get('SRC_DIR') + '/service/third_party_libs.scons', 'lib_env')
@@ -102,7 +101,7 @@ elif target_arch == 'x86_64':
 ######################################################################
 # Test Programs
 ######################################################################
-RpiMain = rpi_env.Program('resource_test', 'resource_test.cpp')
+#RpiMain = rpi_env.Program('resource_test', 'resource_test.cpp')
 RpiMain = rpi_env.Program('controller', 'controller.cpp')
 RpiMain = rpi_env.Program('BootstrapServer', 'bootstrapserver.cpp')
 
