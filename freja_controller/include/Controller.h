@@ -140,12 +140,6 @@ namespace OIC { namespace Service
         FindCallback m_discoveryCallbackBLE;
         DiscoveryManager m_discoveryManagerBLE;
 
-
-        /**
-          * Boolean to indicate if the RD is started already
-          */
-        bool m_RDStarted;
-
         /**
          * @brief m_sceneCollection
          * Collection of the scene. In this case the office
@@ -200,22 +194,6 @@ namespace OIC { namespace Service
          * @param resource The discovered resource
          */
         void foundResourceCallbackBLE(OCResource::Ptr resource);
-
-		/**
-          * Start the Resource Directory Server. Initiates resource discovery
-		  * and stores the discovered resources.
-		  *
-		  * @return Result of the startup
-		  */
-        OCStackResult startRD();
-
-		/**
-          * Stop the Resource Directory Server. Clears all memory used by
-		  * the resource host.
-		  *
-		  * @return Result of the shutdown
-		  */
-        OCStackResult stopRD();
 
         /**
          * Start the Resource Host. It looks for resource with device type

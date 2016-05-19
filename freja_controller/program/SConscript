@@ -88,6 +88,7 @@ ControllerMain = controller_program_env.Program('controller_main', 'main.cpp')
 ControllerMain = controller_program_env.Program('buttonServer', 'buttonserver.cpp')
 ControllerMain = controller_program_env.Program('lightServer', 'lightserver.cpp')
 ControllerMain = controller_program_env.Program('fanServer', 'fanserver.cpp')
+ControllerMain = controller_program_env.Program('resourceDirectory', 'resourceDirectory.cpp')
 
 
 controller_program_env.InstallTarget(ControllerMain, 'controller_main')

@@ -12,7 +12,6 @@ namespace OIC { namespace Service
         m_discoveryCallback(std::bind(&Controller::foundResourceCallback, this, std::placeholders::_1)),
         m_discoveryCallbackBLE(std::bind(&Controller::foundResourceCallbackBLE, this, std::placeholders::_1)),
         m_resourceList(),
-        m_RDStarted(false),
         m_resourceObjectCacheCallback(std::bind(&Controller::resourceObjectCacheCallback, this, std::placeholders::_1, std::placeholders::_2,
                                            std::placeholders::_3)),
         m_resourceObjectStateCallback(std::bind(&Controller::resourceObjectStateCallback, this, std::placeholders::_1,
@@ -56,8 +55,7 @@ namespace OIC { namespace Service
     OCStackResult Controller::start()
     {
         // Start the discoveryManager
-        const std::vector<std::string> types{OIC_DEVICE_LIGHT, OIC_DEVICE_BUTTON, OIC_DEVICE_SENSOR, OIC_DEVICE_FAN, "oic.r.prov"
-                                            , RASPBERRY_PI_DEVICE_CONTROLLER};
+        const std::vector<std::string> types{OIC_DEVICE_LIGHT, OIC_DEVICE_BUTTON, OIC_DEVICE_SENSOR, OIC_DEVICE_FAN};
         m_discoveryTask = Controller::discoverResource(m_discoveryCallback, types);
 
         // Start the DiscoveryManager for BLE devices
@@ -66,10 +64,7 @@ namespace OIC { namespace Service
 
         // Start the discovery manager
         OCStackResult result = OC_STACK_OK;
-        if(startRD() != OC_STACK_OK)
-        {
-            result = OC_STACK_ERROR;
-        }
+
         std::cout << "startRH" << std::endl;
         if(startRH() != OC_STACK_OK)
         {
@@ -85,7 +80,7 @@ namespace OIC { namespace Service
       */
     OCStackResult Controller::stop()
     {
-        OCStackResult result = this->stopRD();
+        OCStackResult result = this->stopRH();
 
         if(!m_discoveryTask->isCanceled())
         {
@@ -124,16 +119,16 @@ namespace OIC { namespace Service
     void Controller::configurePlatform()
     {
         // Create PlatformConfig object
-        /*PlatformConfig cfg {
+        PlatformConfig cfg {
             OC::ServiceType::InProc,
             OC::ModeType::Both,
             "0.0.0.0", // By setting to "0.0.0.0", it binds to all available interfaces
             0,         // Uses randomly available port
-            OC::QualityOfService::HighQos
+            OC::QualityOfService::LowQos 
         };
 
-        OCPlatform::Configure(cfg);*/
-        OCStackResult result = OCInit(NULL, 0, OC_CLIENT_SERVER);
+        OCPlatform::Configure(cfg);
+        //OCStackResult result = OCInit(NULL, 0, OC_CLIENT_SERVER);
     }
 
     /**
@@ -220,57 +215,6 @@ namespace OIC { namespace Service
 
 
     /**
-      * Start the Resource Host. Initiates resource  discovery
-      * and stores the discovered resources.
-      *
-      * @return Result of the startup
-      */
-    OCStackResult Controller::startRD()
-    {
-        OCStackResult result = OCInit(NULL, 0, OC_CLIENT_SERVER);
-
-        if(result != OC_STACK_OK)
-        {
-            std::cout << "Failed to setup platform!" << std::endl;
-        }
-        std::cout << "Inside startRD" << std::endl;
-        if(!m_RDStarted)
-        {
-            std::cout << "Starting OCResource Directory" << std::endl;
-            if (OCRDStart() != OC_STACK_OK)
-            {
-                std::cerr << "Failed to start RD Server" << std::endl;
-                return OC_STACK_ERROR;
-            }
-
-            std::cout << "RD Server started successfully" << std::endl;
-            m_RDStarted = true;
-        }
-
-        return OC_STACK_OK;
-    }
-
-    /**
-      * Stop the Resource Host. Clears all memory used by
-      * the resource host.
-      *
-      * @return Result of the shutdown
-      */
-    OCStackResult Controller::stopRD()
-    {
-        if(m_RDStarted)
-        {
-            if(OCRDStop() != OC_STACK_OK)
-            {
-                std::cout << "Failed to stop the RD Server" << std::endl;
-                return OC_STACK_ERROR;
-            }
-        }
-
-        return OC_STACK_OK;
-    }
-
-    /**
      * Start the Resource Host. It looks for resource with device type
      * oic.r.resourcehosting
      *
@@ -287,6 +231,12 @@ namespace OIC { namespace Service
         }
 
         std::cout << "Resource Hosting service started successfully" << std::endl;
+
+  /*          while (true)
+    {
+        sleep(2);
+    }
+*/
         return OC_STACK_OK;
     }
 
