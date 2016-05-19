@@ -110,7 +110,7 @@ RpiMain = rpi_env.Program('TVResource', 'tvResource.cpp')
 RpiMain = rpi_env.Program('ButtonLightResource', 'ButtonLightResource.cpp')
 
 RpiMain = rpi_env.Program('LightResourceHosting', 'LightResourceHosting.cpp')
-
+RpiMain = rpi_env.Program('LightResourceConstrained', 'LightResourceConstrained.cpp')
 
 rpi_env.InstallTarget(RpiMain, 'resource_test')
 

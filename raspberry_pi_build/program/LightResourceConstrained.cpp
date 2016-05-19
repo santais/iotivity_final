@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include "oic_string.h"
 
+#include <iostream>
+
+
 #include "OCPlatform.h"
 #include "OCApi.h"
 #include <iostream>
@@ -16,6 +19,8 @@ using namespace OC;
 OCResourceHandle g_lightResource;
 char g_rdAddress[MAX_ADDR_STR_SIZE];
 uint16_t g_rdPort;
+
+bool g_rdDiscovered = false;
 
 int g_quitFlag = false;
 
@@ -53,6 +58,7 @@ int biasFactorCB(char addr[MAX_ADDR_STR_SIZE], uint16_t port)
     OICStrcpy(g_rdAddress, MAX_ADDR_STR_SIZE, addr);
     g_rdPort = port;
     std::cout << "RD Address is : " <<  addr << ":" << port << std::endl;
+    g_rdDiscovered = true;
     return 0;
 }
 /*
@@ -122,20 +128,26 @@ int main()
 
 int main()
 {
-    std:cout << "Starting platform setup" << std::endl;
+    std::cout << "Starting platform setup" << std::endl;
 
     OC::PlatformConfig cfg;
 
     OC::OCPlatform::Configure(cfg);
 
+    //signal(SIGINT, handleSigInt);
     std::cout << "Setup completed" << std::endl;
-    signal(SIGINT, handleSigInt);
-
-    while(OCRDDiscover(biasFactorCB) != OC_STACK_OK);
 
     // RD discovered. Publisher resources
     std::cout << "Creating resource" << std::endl;
     registerLocalResources();
+
+    while(!g_rdDiscovered)
+    {
+        OCRDDiscover(biasFactorCB);
+        sleep(2);
+        std::cout << "Retrying.." << std::endl;
+    }
+
     OCRDPublish(g_rdAddress, g_rdPort, 1, g_lightResource);
 
     if(OCStartPresence(60 * 60) != OC_STACK_OK)

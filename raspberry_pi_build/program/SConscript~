@@ -32,7 +32,7 @@ rpi_env.AppendUnique(CPPPATH = ['../../service/resource-directory/include'])
 
 	
 
-if target_arch in 'ARM':
+if target_arch in 'arm':
 	rpi_env.AppendUnique(LIBS = [
 		'rcs_client',
 		'rcs_server',
@@ -110,7 +110,7 @@ RpiMain = rpi_env.Program('TVResource', 'tvResource.cpp')
 RpiMain = rpi_env.Program('ButtonLightResource', 'ButtonLightResource.cpp')
 
 RpiMain = rpi_env.Program('LightResourceHosting', 'LightResourceHosting.cpp')
-
+RpiMain = rpi_env.Program('LightResourceHosting', 'LightResourceHosting.cpp')
 
 rpi_env.InstallTarget(RpiMain, 'resource_test')
 
