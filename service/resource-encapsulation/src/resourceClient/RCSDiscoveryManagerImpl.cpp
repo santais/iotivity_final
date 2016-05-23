@@ -28,7 +28,7 @@
 
 namespace
 {
-    constexpr unsigned int POLLING_INTERVAL_TIME = 60000;
+    constexpr unsigned int POLLING_INTERVAL_TIME = 6000;
 
     std::string makeResourceId(const std::shared_ptr< OIC::Service::PrimitiveResource >& resource)
     {

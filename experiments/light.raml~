@@ -1,0 +1,92 @@
+#%RAML 0.8
+title: OICBinarySwitch
+version: v1.0-20150727
+
+/a/light:
+  description: |
+    This resource describes a binary switch (on/off).
+    The value is a boolean.
+    A value of 'true' means that the switch is on.
+    A value of 'false' means that the switch is off.
+  displayName: Light
+
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            schema: |
+              {
+                "$schema": "http://json-schema.org/draft-04/schema#",                
+                "properties": {
+                  "rt": {
+                    "type": "string",
+                    "description": "ReadOnly, Resource Type",
+                    "default": "oic.r.switch.binary"
+                  },
+                  "if": {
+                    "type": "string",
+                    "description": "ReadOnly, Resource Interface",
+                    "default": "oic.if.baseline"
+                  },
+                  "n": {
+                    "type": "string",
+                    "description": "Readonly, Human friendly name",
+                    "default": "LED"
+                  },
+                  "value": {
+                    "type": "boolean",
+                    "description": "Status of the LED",
+                    "enum": [true,false],
+                    "default": false
+                  }
+                }
+              }
+            example: |
+              {
+                "rt":     "oic.r.switch.binary",
+                "id":     "unique_example_id",
+                "value":  false
+              }
+  post:
+    body:
+      application/json:
+        schema: |
+          {
+            "$schema": "http://json-schema.org/draft-04/schema#",                
+            "properties": {
+              "value": {
+                "type": "boolean",
+                "description": "Status of the switch",
+                "enum": [true,false],
+                "default": false
+              }
+            }
+          }
+        example: |
+          {
+            "id":    "unique_example_id",
+            "value": true
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            schema: |
+              {
+                "$schema": "http://json-schema.org/draft-04/schema#",                
+                "properties": {
+                  "value": {
+                    "type": "boolean",
+                    "description": "Status of the switch",
+                    "enum": [true,false],
+                    "default": false
+                  }
+                }
+              }
+            example: |
+              {
+                "id":    "unique_example_id",
+                "value": true
+              }
+
