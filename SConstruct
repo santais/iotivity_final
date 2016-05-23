@@ -88,3 +88,7 @@ if target_os == 'linux':
 	SConscript(build_dir + 'raspberry_pi_build/SConscript')
 	SConscript(build_dir + 'freja_controller/SConscript')
 
+if target_os == 'linux':
+	# Build the experimental programs
+	SConscript(build_dir + 'experiments/SConscript')
+
