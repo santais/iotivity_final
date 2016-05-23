@@ -11,6 +11,8 @@
 #define MAX_TIMEOUT_MILLISECONDS MAX_TIMEOUT_SECONDS * 1000
 #define MAX_TIMEOUT_MICROSECONDS MAX_TIMEOUT_MILLISECONDS * 1000
 
+#define NUMBER_OF_ITERATIONS 50
+
 typedef std::chrono::milliseconds milliseconds;
 typedef std::chrono::microseconds microseconds;
 
@@ -53,7 +55,7 @@ void foundResourceCallback(std::shared_ptr<RCSRemoteResourceObject> resource)
     {
         g_timeMutex.lock();
         g_discoveredResources++;
-        std::cout << "Discovered resources: " << g_discoveredResources << std::endl;
+        //std::cout << "Discovered resources: " << g_discoveredResources << std::endl;
 
         // Restart timer
         g_startTimer = getChronoTimeNowAsDouble();
@@ -64,6 +66,9 @@ void foundResourceCallback(std::shared_ptr<RCSRemoteResourceObject> resource)
 
 int main() 
 {
+    int iterations = 0;
+    double timeDifference = 0;
+
     std::cout << "Click any key to start" << std::endl;
 
     std::string input;
@@ -78,25 +83,46 @@ int main()
     g_startTimer = g_beginTimer = getChronoTimeNowAsDouble();
     std::cout << "Start timer:  " << g_beginTimer << " μs" << std::endl;
 
-    while(!g_terminateDiscovery)
+    while(iterations < NUMBER_OF_ITERATIONS)
     {
-        g_stopTimer = getChronoTimeNowAsDouble();
-        g_timeMutex.lock();
-        double difference = g_stopTimer - g_startTimer;
-        g_timeMutex.unlock();
+        while(!g_terminateDiscovery)
+        {
+            g_stopTimer = getChronoTimeNowAsDouble();
+            g_timeMutex.lock();
+            double difference = g_stopTimer - g_startTimer;
+            g_timeMutex.unlock();
 
-        if(difference >= MAX_TIMEOUT_MICROSECONDS)
-        {
-            g_terminateDiscovery = true;
+            if(difference >= MAX_TIMEOUT_MICROSECONDS)
+            {
+                g_terminateDiscovery = true;
+            }
+            else
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
         }
-        else
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
+
+        // Calculate total time
+        std::cout << "Total discovery time: " << g_startTimer - g_beginTimer << " μs" << std::endl;
+        g_discoveryTask->cancel();
+        g_foundResourceMap.clear();
+
+        // Save the time difference
+        timeDifference += g_startTimer - g_beginTimer;
+
+        // Restart the timers and while condition
+        g_terminateDiscovery = false;
+        g_startTimer = g_beginTimer = getChronoTimeNowAsDouble();
+        g_discoveryTask = RCSDiscoveryManager::getInstance()->discoverResourceByType(RCSAddress::multicast(),
+                                            "oic.d.light", foundResourceCallback);
+
+        // Iterate
+        iterations++;
     }
 
-    // Calculate total time
-    std::cout << "Total discovery time: " << g_startTimer - g_beginTimer << " μs" << std::endl;
+    timeDifference /= NUMBER_OF_ITERATIONS;
+
+    std::cout << "\n\n Total average discovery time: " << timeDifference;
 
 	return 0;
 }
