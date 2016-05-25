@@ -1,59 +1,15 @@
-#include "resource_types.h"
-#include <stdlib.h>
-#include <string>
-#include <signal.h>
-#include <unistd.h>
-#include "oic_string.h"
+#include <functional>
 
-#include "ocbaseresource.h"
-#include "resource_types.h"
-
-#include <iostream>
+#include <pthread.h>
+#include <mutex>
+#include <condition_variable>
 
 #include "OCPlatform.h"
 #include "OCApi.h"
-#include <iostream>
-
-#include "rd_client.h"
 
 using namespace OC;
 using namespace std;
 namespace PH = std::placeholders;
-
-static const char* SVR_DB_FILE_NAME = "./oic_svr_db_server.dat";
-int gObservation = 0;
-void * ChangeLightRepresentation (void *param);
-void * handleSlowResponse (void *param, std::shared_ptr<OCResourceRequest> pRequest);
-
-// Specifies where to notify all observers or list of observers
-// false: notifies all observers
-// true: notifies list of observers
-bool isListOfObservers = false;
-
-// Specifies secure or non-secure
-// false: non-secure resource
-// true: secure resource
-bool isSecure = false;
-
-/// Specifies whether Entity handler is going to do slow response or not
-bool isSlowResponse = false;
-
-
-OCResourceHandle g_lightResourceHandle;
-char g_rdAddress[MAX_ADDR_STR_SIZE];
-uint16_t g_rdPort;
-
-bool g_rdDiscovered = false;
-
-int g_quitFlag = false;
-
-void handleSigInt(int signum)
-{
-    if(signum == SIGINT)
-    {
-        g_quitFlag = true;
-    }
-}
 
 class LightResource
 {
@@ -76,34 +32,29 @@ public:
         // Initialize representation
         m_lightRep.setUri(m_lightUri);
 
-        m_lightRep.setValue("state", (bool) m_state);
-        m_lightRep.setValue("brightness", (int) m_power);
+        m_lightRep.setValue("state", m_state);
+        m_lightRep.setValue("power", m_power);
         m_lightRep.setValue("name", m_name);
     }
 
     /* Note that this does not need to be a member function: for classes you do not have
     access to, you can accomplish this with a free function: */
 
-    /// This function internally calls lResource API.
+    /// This function internally calls registerResource API.
     void createResource()
     {
         //URI of the resource
         std::string resourceURI = m_lightUri;
         //resource type name. In this case, it is light
-        std::string resourceTypeName = OIC_DEVICE_LIGHT;
+        std::string resourceTypeName = "oic.d.light";
         // resource interface.
         std::string resourceInterface = DEFAULT_INTERFACE;
 
         // OCResourceProperty is defined ocstack.h
         uint8_t resourceProperty;
-        if(isSecure)
-        {
-            resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE;
-        }
-        else
-        {
-            resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE;
-        }
+    
+        resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE;
+        
         EntityHandler cb = std::bind(&LightResource::entityHandler, this,PH::_1);
 
         // This will internally create and register the resource.
@@ -122,20 +73,15 @@ public:
         // URI of the resource
         std::string resourceURI = "/a/light1";
         // resource type name. In this case, it is light
-        std::string resourceTypeName = "core.light";
+        std::string resourceTypeName = "oic.d.light";
         // resource interface.
         std::string resourceInterface = DEFAULT_INTERFACE;
 
         // OCResourceProperty is defined ocstack.h
         uint8_t resourceProperty;
-        if(isSecure)
-        {
-            resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE;
-        }
-        else
-        {
-            resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE;
-        }
+       
+        resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE;
+        
         EntityHandler cb = std::bind(&LightResource::entityHandler, this,PH::_1);
 
         OCResourceHandle resHandle;
@@ -173,7 +119,7 @@ public:
                 cout << "\t\t\t\t" << "state not found in the representation" << endl;
             }
 
-            if (rep.getValue("brightness", m_power))
+            if (rep.getValue("power", m_power))
             {
                 cout << "\t\t\t\t" << "power: " << m_power << endl;
             }
@@ -195,7 +141,7 @@ public:
     // updates the internal state
     OCRepresentation post(OCRepresentation& rep)
     {
-        /*static int first = 0;
+        /*static int first = 1;
 
         // for the first time it tries to create a resource
         if(first)
@@ -222,8 +168,8 @@ public:
     // sending out.
     OCRepresentation get()
     {
-        m_lightRep.setValue("state", (bool) m_state);
-        m_lightRep.setValue("brightness", (int) m_power);
+        m_lightRep.setValue("state", m_state);
+        m_lightRep.setValue("power", m_power);
 
         return m_lightRep;
     }
@@ -283,6 +229,7 @@ OCEntityHandlerResult entityHandler(std::shared_ptr<OCResourceRequest> request)
             if(requestType == "GET")
             {
                 cout << "\t\t\trequestType : GET\n";
+
                 pResponse->setErrorCode(200);
                 pResponse->setResponseResult(OC_EH_OK);
                 pResponse->setResourceRepresentation(get());
@@ -290,7 +237,7 @@ OCEntityHandlerResult entityHandler(std::shared_ptr<OCResourceRequest> request)
                 {
                     ehResult = OC_EH_OK;
                 }
-
+            
             }
             else if(requestType == "PUT")
             {
@@ -358,7 +305,6 @@ OCEntityHandlerResult entityHandler(std::shared_ptr<OCResourceRequest> request)
             pthread_t threadId;
 
             cout << "\t\trequestFlag : Observer\n";
-            gObservation = 1;
 
             ehResult = OC_EH_OK;
         }
@@ -372,103 +318,3 @@ OCEntityHandlerResult entityHandler(std::shared_ptr<OCResourceRequest> request)
 }
 
 };
-
-
-//OCResourceHandle g_lightResourceHandle;
-void registerLocalResources()
-{
-    std::string resourceURI_thermostat = "/a/thermostat";
-    std::string resourceTypeName_thermostat = "core.thermostat";
-    std::string resourceURI_light = "/a/light";
-    std::string resourceTypeName_light = "oic.d.light";
-    std::string resourceInterface = OC_RSRVD_INTERFACE_DEFAULT;
-    uint8_t resourceProperty = OC_DISCOVERABLE;
-
-    OCStackResult result; /*= OCPlatform::registerResource(g_lightResourceHandle,
-                           resourceURI_thermostat,
-                           resourceTypeName_thermostat,
-                           resourceInterface,
-                           NULL,
-                           resourceProperty);
-
-    if (OC_STACK_OK != result)
-    {
-        throw std::runtime_error(
-            std::string("Device Resource failed to start") + std::to_string(result));
-    }*/
-
-    result = OCPlatform::registerResource(g_lightResourceHandle,
-                                          resourceURI_light,
-                                          resourceTypeName_light,
-                                          resourceInterface,
-                                          NULL,
-                                          resourceProperty);
-
-    result = OCPlatform::bindTypeToResource(g_lightResourceHandle, "oic.d.binary.switch");
-
-    if (OC_STACK_OK != result)
-    {
-        throw std::runtime_error(
-            std::string("Device Resource failed to start") + std::to_string(result));
-    }
-}
-
-
-int biasFactorCB(char addr[MAX_ADDR_STR_SIZE], uint16_t port)
-{
-    OICStrcpy(g_rdAddress, MAX_ADDR_STR_SIZE, addr);
-    g_rdPort = port;
-    std::cout << "RD Address is : " <<  addr << ":" << port << std::endl;
-    g_rdDiscovered = true;
-    return 0;
-}
-
-
-int main()
-{
-    std::cout << "Starting platform setup" << std::endl;
-
-    OC::PlatformConfig cfg;
-
-    OC::OCPlatform::Configure(cfg);
-
-    //signal(SIGINT, handleSigInt);
-    std::cout << "Setup completed" << std::endl;
-
-    // RD discovered. Publisher resources
-    std::cout << "Creating resource" << std::endl;
-
-    registerLocalResources();
-    /*
-    LightResource lightResource;
-    lightResource.createResource();
-    lightResource.addType(OIC_TYPE_BINARY_SWITCH);*/
-
-    while(!g_rdDiscovered)
-    {
-        OCRDDiscover(biasFactorCB);
-        sleep(2);
-        std::cout << "Retrying.." << std::endl;
-    }
-
-    OCRDPublish(g_rdAddress, g_rdPort, 1, g_lightResourceHandle);//lightResource.getHandle());
-
-    sleep(2);
-
-    if(OCStartPresence(60 * 60) != OC_STACK_OK)
-    {
-        //OIC_LOG(ERROR, TAG, "Unable to start presence server");
-    }
-
-    std::cout << "Resources published" << std::endl;
-
-    while(!g_quitFlag)
-    {
-        if(OCProcess() != OC_STACK_OK)
-        {
-            return 0;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    }
-
-}
