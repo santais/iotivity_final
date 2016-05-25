@@ -11,7 +11,157 @@
 ** Date: 06/01/16
 ** -------------------------------------------------------------------------*/
 
-#include "ocbaseresource.h"
+//#include "ocbaseresource.h"
+
+
+typedef struct OCBaseResourceT OCBaseResourceT;
+
+/**
+  * 8 bit variable declaring a port type
+  */
+typedef enum IOPortType
+{
+    IN      = 0,
+    OUT     = (1 << 0),
+    INOUT   = (2 << 0)
+} IOPortType;
+
+/**
+  * Structure defining which port to assign a value.
+  */
+typedef struct OCIOPort
+{
+    IOPortType type;
+
+    uint8_t pin;
+} OCIOPort;
+
+
+/**
+  * The application calls this callback, when a PUT request has been initiated. The user
+  * has to manually set what how the vlaues are sent to the ports (PWM, PPM etc.):
+  */
+typedef void (*OCIOHandler)
+(OCRepPayloadValue *attribute, OCIOPort *port, OCResourceHandle handle, bool *underObservation);
+
+
+/**
+  * BaseResource containing the necessary parameters for a resource.
+  * Somehow similar to OCResource internal struct with minor changes.
+  */
+typedef struct OCBaseResourceT
+{
+    /** Points to the next resource. Used to forma  list of created resources */
+    OCBaseResourceT *next;
+
+    /** Handle to handle the resource current data to the connectivity layer */
+    OCResourceHandle handle;
+
+    /** Relative path on the device. */
+    char *uri;
+
+    /** Human friendly name */
+    char* name;
+
+    /** Resource type(s). Linked list */
+    OCResourceType *type;
+
+    /** Resource interface(s). Linked list */
+    OCResourceInterface *interface;
+
+    /** Resource attributes. Linked list */
+    OCRepPayloadValue *attribute;
+
+    /** Resource Properties */
+    uint8_t resourceProperties;
+
+    /** Bool indicating if it is being observed */
+    bool underObservation;
+
+    /** Callback called when a PUT method has been called */
+    OCIOHandler OCIOhandler;
+
+    /** I/O Port associated with the resource */
+    OCIOPort* port;
+
+} OCBaseResourceT;
+
+/*********************** REVISED VERSION 1.1 **************************/
+
+/**
+  * @brief Initializes and creates a resource
+  *
+  * @param uri          Path and name of the resource
+  * @param interface    Resource interfaces
+  * @param type         Resource types
+  * @param properties   Byte of allowed properties of the resources
+  * @param outputHandler Callback called when a PUT request is received
+  *
+  * @return Pointer to the created resource
+  */
+OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInterface* interface,
+                         uint8_t properties, OCIOHandler outputHandler, OCIOPort* port);
+
+
+/**
+  * @brief createResource
+  *
+  * @param uri           Path and name of the resource
+  * @param type          Resource interface
+  * @param interface     Resource type
+  * @param properties    Allowed properties of the resource
+  * @param outputHandler Callback called when a PUT request is received
+  *
+  * @return
+  */
+OCBaseResourceT * createResource(char* uri, const char* type, const char* interface, uint8_t properties,
+                                 OCIOHandler outputHandler, OCIOPort* port);
+
+/**
+ * @brief Initializes and creates a resource
+ *
+ * @param resource      Resource to be initialized
+ */
+void createResource(OCBaseResourceT *resource);
+
+
+/**
+ * @brief addType Adds and bind a type to a resource
+ *
+ * @param handle        The handle of the resource
+ * @param type          Type to be bound and added
+ *
+ * @return              OC_STACK_OK if successfully bound
+ */
+OCStackResult addType(OCBaseResourceT *resource, OCResourceType *type);
+OCStackResult addType(OCBaseResourceT *resource, const char *typeName);
+
+/**
+ * @brief addInterface Adds and bind a interface to a resource
+ *
+ * @param handle        The handle of the resource
+ * @param interface     Type to be bound and added
+ *
+ * @return              OC_STACK_OK if successfully bound
+ */
+OCStackResult addInterface(OCBaseResourceT *resource, OCResourceInterface *interface);
+OCStackResult addInterface(OCBaseResourceT *resource, const char* interfaceName);
+
+/**
+ * @brief addAttribute  Adds an attribute to the resource
+ *
+ * @param resource      The resource to add an attribute to
+ * @param attribute     The attribute to be added
+ */
+OCStackResult addAttribute(OCRepPayloadValue **head, OCRepPayloadValue *attribute);
+//OCStackResult addAttribute(OCRepPayloadValue **head, OCRepPayloadValue *value);
+
+/**
+ * @brief getResourceList Returns the list of registered devices
+ *
+ * @return The list of registered devices
+ */
+OCBaseResourceT * getResourceList();
 
 /*********** CONSTANT VARIABLES ****************/
 static const int URI_MAXSIZE = 19;
@@ -277,9 +427,7 @@ OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInte
     if(res != OC_STACK_OK) 
     {
       OIC_LOG(ERROR, TAG, "Error calling OCCreateResource. Error code is: \n");
-      #ifdef WITH_ARDUINO
       Serial.println(getOCStackResult(res));
-      #endif
       return NULL;
     }
 
@@ -308,7 +456,7 @@ OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInte
         currentInterface = currentInterface->next;
     }
 
-    #ifdef WITH_ARDUINO
+    //#ifdef WITH_ARDUINO
 
     if(port)
     {
@@ -320,7 +468,7 @@ OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInte
         OIC_LOG_V(DEBUG, TAG, "New port initalized at port %i", (int) port->pin);
     }
 
-    #endif
+    //#endif
 
     // Add the resource to the list of available resources
     pushResorcetoList(&resource);
@@ -339,7 +487,7 @@ OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInte
   *
   * @return
   */
-OCBaseResourceT * createResource1(char* uri, const char* type, const char* interface, uint8_t properties,
+OCBaseResourceT * createResource(char* uri, const char* type, const char* interface, uint8_t properties,
                                  OCIOHandler outputHandler, OCIOPort* port)
 {
     OCResourceType resourceType;
@@ -359,7 +507,7 @@ OCBaseResourceT * createResource1(char* uri, const char* type, const char* inter
  *
  * @param resource      Resource to be initialized
  */
-void createResource2(OCBaseResourceT *resource)
+void createResource(OCBaseResourceT *resource)
 {
     createResource(resource->uri, resource->type, resource->interface,
                    resource->resourceProperties, resource->OCIOhandler, resource->port);
@@ -404,7 +552,7 @@ OCStackResult addType(OCBaseResourceT *resource, OCResourceType *type)
  *
  * @return OC_STACK_OK if successfully
  */
-OCStackResult addType1(OCBaseResourceT *resource, const char *typeName)
+OCStackResult addType(OCBaseResourceT *resource, const char *typeName)
 {
     OCResourceType *type = (OCResourceType*)malloc(sizeof(OCBaseResourceT));
     if(type == NULL) {printNoMemoryMsg(); return OC_STACK_NO_MEMORY;}
@@ -456,7 +604,7 @@ OCStackResult addInterface(OCBaseResourceT *resource, OCResourceInterface *inter
  *
  * @return OC_STACK_OK if successfully bound
  */
-OCStackResult addInterface1(OCBaseResourceT *resource, const char *interfaceName)
+OCStackResult addInterface(OCBaseResourceT *resource, const char *interfaceName)
 {
     OCResourceInterface *interface = (OCResourceInterface*)malloc(sizeof(OCResourceInterface));
     if(interface == NULL) {printNoMemoryMsg(); return OC_STACK_NO_MEMORY;}
@@ -822,7 +970,7 @@ OCEntityHandlerResult observerHandler(OCEntityHandlerRequest *ehRequest, OCBaseR
         {
         case OCREP_PROP_INT:
         {
-            int64_t value = 0;
+            int64_t value(0);
             if(OCRepPayloadGetPropInt(inputPayload, current->name, &value))
             {
                 //OIC_LOG_V(DEBUG, TAG, "PUT: Type is int: %i", (int) value);
@@ -834,7 +982,7 @@ OCEntityHandlerResult observerHandler(OCEntityHandlerRequest *ehRequest, OCBaseR
         }
         case OCREP_PROP_DOUBLE:
         {
-            double value = 0;
+            double value(0);
             if(OCRepPayloadGetPropDouble(inputPayload, current->name, &value))
             {
                 //OIC_LOG_V(DEBUG, TAG, "PUT: type is double: &d", value);
@@ -846,7 +994,7 @@ OCEntityHandlerResult observerHandler(OCEntityHandlerRequest *ehRequest, OCBaseR
         }
         case OCREP_PROP_STRING:
         {
-            char* value = "";
+            char* value("");
             if(OCRepPayloadGetPropString(inputPayload, current->name, &value))
             {
                 //OIC_LOG_V(DEBUG, TAG, "PUT: type is string: %s", value);
@@ -857,7 +1005,7 @@ OCEntityHandlerResult observerHandler(OCEntityHandlerRequest *ehRequest, OCBaseR
         }
         case OCREP_PROP_BOOL:
         {
-            bool value = false;
+            bool value(false);
             if(OCRepPayloadGetPropBool(inputPayload, current->name, &value))
             {
                 //OIC_LOG_V(DEBUG, TAG, "PUT: Type is bool: %s", value ? "true" : "false");
@@ -911,21 +1059,21 @@ OCEntityHandlerResult observerHandler(OCEntityHandlerRequest *ehRequest, OCBaseR
         OCRepPayload* inputPayload = (OCRepPayload*)(ehRequest->payload);
 
         // Create the resource
-        OCBaseResourceT *newResource = createResource1(inputPayload->uri, inputPayload->types->value,
+        OCBaseResourceT *newResource = createResource(inputPayload->uri, inputPayload->types->value,
           inputPayload->interfaces->value, OC_OBSERVABLE | OC_DISCOVERABLE, NULL, NULL);
 
         // Add the remaining types and interfaces
         OCStringLL *type = inputPayload->types->next;
         while(type != NULL) 
         {
-          addType1(newResource, type->value);
+          addType(newResource, type->value);
           type = type->next;
         }
 
         OCStringLL *interface = inputPayload->interfaces->next;
         while(interface != NULL)
         {
-          addInterface1(newResource, interface->value);
+          addInterface(newResource, interface->value);
           interface = interface->next;
         }
 

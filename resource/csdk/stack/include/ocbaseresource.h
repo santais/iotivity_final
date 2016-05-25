@@ -48,10 +48,10 @@
 #include "ocresource.h"
 #include "octypes.h"
 //#include <vector>
-/*
+
 #ifdef __cplusplus
 extern "C" {
-#endif*/
+#endif
 
 /****************** MACRO *********************/
 static inline bool VERIFY_MEMORY_ALLOCATION(void* object)
@@ -165,7 +165,7 @@ OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInte
   *
   * @return
   */
-OCBaseResourceT * createResource(char* uri, const char* type, const char* interface, uint8_t properties,
+OCBaseResourceT * createResource1(char* uri, const char* type, const char* interface, uint8_t properties,
                                  OCIOHandler outputHandler, OCIOPort* port);
 
 /**
@@ -173,7 +173,7 @@ OCBaseResourceT * createResource(char* uri, const char* type, const char* interf
  *
  * @param resource      Resource to be initialized
  */
-void createResource(OCBaseResourceT *resource);
+void createResource2(OCBaseResourceT *resource);
 
 
 /**
@@ -185,7 +185,7 @@ void createResource(OCBaseResourceT *resource);
  * @return              OC_STACK_OK if successfully bound
  */
 OCStackResult addType(OCBaseResourceT *resource, OCResourceType *type);
-OCStackResult addType(OCBaseResourceT *resource, const char *typeName);
+OCStackResult addType1(OCBaseResourceT *resource, const char *typeName);
 
 /**
  * @brief addInterface Adds and bind a interface to a resource
@@ -196,7 +196,7 @@ OCStackResult addType(OCBaseResourceT *resource, const char *typeName);
  * @return              OC_STACK_OK if successfully bound
  */
 OCStackResult addInterface(OCBaseResourceT *resource, OCResourceInterface *interface);
-OCStackResult addInterface(OCBaseResourceT *resource, const char* interfaceName);
+OCStackResult addInterface1(OCBaseResourceT *resource, const char* interfaceName);
 
 /**
  * @brief addAttribute  Adds an attribute to the resource
@@ -214,10 +214,10 @@ OCStackResult addAttribute(OCRepPayloadValue **head, OCRepPayloadValue *attribut
  */
 OCBaseResourceT * getResourceList();
 
-/*
+
 #ifdef __cplusplus
 }
-#endif*/
+#endif
 
 #endif /* _OCBASERESOURCE_H */
 
