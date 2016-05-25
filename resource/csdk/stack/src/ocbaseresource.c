@@ -240,6 +240,7 @@ void pushResorcetoList(OCBaseResourceT **head)
 OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInterface* interface,
                          uint8_t properties, OCIOHandler outputHandler, OCIOPort* port)
 {
+    printf("Inside createResource\n");
     // Create the resource
     OIC_LOG_V(DEBUG, TAG, "Creating resource with uri: %s\n", uri);
     OIC_LOG(DEBUG, TAG, "Entering createResource...");
@@ -274,11 +275,15 @@ OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInte
             resource->resourceProperties);
     OIC_LOG_V(DEBUG, TAG, "Created resource with OCStackResult: %s", res);
 
+    //printf("Created resource with OCStackREsult: %s", res);
+
     if(res != OC_STACK_OK) 
     {
       OIC_LOG(ERROR, TAG, "Error calling OCCreateResource. Error code is: \n");
       #ifdef WITH_ARDUINO
-      Serial.println(getOCStackResult(res));
+        Serial.println(getOCStackResult(res));
+      #else
+        printf("error calling OCCreateResource");
       #endif
       return NULL;
     }
@@ -342,6 +347,7 @@ OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInte
 OCBaseResourceT * createResource1(char* uri, const char* type, const char* interface, uint8_t properties,
                                  OCIOHandler outputHandler, OCIOPort* port)
 {
+    printf("Inside createResource1\n");
     OCResourceType resourceType;
     resourceType.resourcetypename = (char*) type;
     resourceType.next = NULL;

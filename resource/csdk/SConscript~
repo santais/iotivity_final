@@ -124,21 +124,57 @@ if liboctbstack_env.get('ROUTING') in ['GW', 'EP']:
 # Source files and Targets
 ######################################################################
 OCTBSTACK_SRC = 'stack/src/'
-liboctbstack_src = [
-	'../../extlibs/cjson/cJSON.c',
-	'../../extlibs/timer/timer.c',
-	OCTBSTACK_SRC + 'ocstack.c',
-	OCTBSTACK_SRC + 'ocpayload.c',
-	OCTBSTACK_SRC + 'ocpayloadparse.c',
-	OCTBSTACK_SRC + 'ocpayloadconvert.c',
-	OCTBSTACK_SRC + 'occlientcb.c',
-	OCTBSTACK_SRC + 'ocresource.c',
-	OCTBSTACK_SRC + 'ocobserve.c',
-	OCTBSTACK_SRC + 'ocserverrequest.c',
-	OCTBSTACK_SRC + 'occollection.c',
-	OCTBSTACK_SRC + 'oicgroup.c',
-	OCTBSTACK_SRC + "rdpayload.c"
-	]
+if target_os in ['arduino']:
+	liboctbstack_src = [
+		'../../extlibs/cjson/cJSON.c',
+		'../../extlibs/timer/timer.c',
+		OCTBSTACK_SRC + 'ocstack.c',
+		OCTBSTACK_SRC + 'ocpayload.c',
+		OCTBSTACK_SRC + 'ocpayloadparse.c',
+		OCTBSTACK_SRC + 'ocpayloadconvert.c',
+		OCTBSTACK_SRC + 'occlientcb.c',
+		OCTBSTACK_SRC + 'ocresource.c',
+		OCTBSTACK_SRC + 'ocobserve.c',
+		OCTBSTACK_SRC + 'ocserverrequest.c',
+		OCTBSTACK_SRC + 'occollection.c',
+		OCTBSTACK_SRC + 'oicgroup.c',
+		OCTBSTACK_SRC + "rdpayload.c",
+		OCTBSTACK_SRC + 'ocbaseresource.c'
+		]
+elif target_os in ['linux']:
+	liboctbstack_src = [
+		'../../extlibs/cjson/cJSON.c',
+		'../../extlibs/timer/timer.c',
+		OCTBSTACK_SRC + 'ocstack.c',
+		OCTBSTACK_SRC + 'ocpayload.c',
+		OCTBSTACK_SRC + 'ocpayloadparse.c',
+		OCTBSTACK_SRC + 'ocpayloadconvert.c',
+		OCTBSTACK_SRC + 'occlientcb.c',
+		OCTBSTACK_SRC + 'ocresource.c',
+		OCTBSTACK_SRC + 'ocobserve.c',
+		OCTBSTACK_SRC + 'ocserverrequest.c',
+		OCTBSTACK_SRC + 'occollection.c',
+		OCTBSTACK_SRC + 'oicgroup.c',
+		OCTBSTACK_SRC + "rdpayload.c",
+		OCTBSTACK_SRC + 'ocbaseresource.c'
+		]
+else:
+	liboctbstack_src = [
+		'../../extlibs/cjson/cJSON.c',
+		'../../extlibs/timer/timer.c',
+		OCTBSTACK_SRC + 'ocstack.c',
+		OCTBSTACK_SRC + 'ocpayload.c',
+		OCTBSTACK_SRC + 'ocpayloadparse.c',
+		OCTBSTACK_SRC + 'ocpayloadconvert.c',
+		OCTBSTACK_SRC + 'occlientcb.c',
+		OCTBSTACK_SRC + 'ocresource.c',
+		OCTBSTACK_SRC + 'ocobserve.c',
+		OCTBSTACK_SRC + 'ocserverrequest.c',
+		OCTBSTACK_SRC + 'occollection.c',
+		OCTBSTACK_SRC + 'oicgroup.c',
+		OCTBSTACK_SRC + 'rdpayload.c',
+		OCTBSTACK_SRC + 'ocbaseresource.c'
+		]
 
 if with_tcp == True:
 	liboctbstack_src.append(OCTBSTACK_SRC + 'oickeepalive.c')
