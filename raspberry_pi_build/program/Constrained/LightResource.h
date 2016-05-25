@@ -33,7 +33,7 @@ public:
         m_lightRep.setUri(m_lightUri);
 
         m_lightRep.setValue("state", m_state);
-        m_lightRep.setValue("power", m_power);
+        m_lightRep.setValue("brightness", m_power);
         m_lightRep.setValue("name", m_name);
     }
 
@@ -119,13 +119,13 @@ public:
                 cout << "\t\t\t\t" << "state not found in the representation" << endl;
             }
 
-            if (rep.getValue("power", m_power))
+            if (rep.getValue("brightness", m_power))
             {
-                cout << "\t\t\t\t" << "power: " << m_power << endl;
+                cout << "\t\t\t\t" << "brightness: " << m_power << endl;
             }
             else
             {
-                cout << "\t\t\t\t" << "power not found in the representation" << endl;
+                cout << "\t\t\t\t" << "brightness not found in the representation" << endl;
             }
         }
         catch (exception& e)
@@ -169,7 +169,7 @@ public:
     OCRepresentation get()
     {
         m_lightRep.setValue("state", m_state);
-        m_lightRep.setValue("power", m_power);
+        m_lightRep.setValue("brightness", m_power);
 
         return m_lightRep;
     }
