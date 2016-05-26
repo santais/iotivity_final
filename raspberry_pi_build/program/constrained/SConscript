@@ -32,8 +32,7 @@ rd_sample_app_env = lib_env.Clone()
 ######################################################################
 # Build flags
 ######################################################################
-rd_sample_app_env.AppendUnique(CPPPATH = ['/home/markpovlsen/Documents/iotivity/service/resource-directory/include'])
-
+rd_sample_app_env.AppendUnique(CPPPATH = ['../../../service/resource-directory/include']
 rd_sample_app_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-Wextra', '-std=c++0x', '-Wno-error'])
 rd_sample_app_env.AppendUnique(LIBPATH = [env.get('BUILD_DIR')])
 rd_sample_app_env.AppendUnique(RPATH = [env.get('BUILD_DIR')])
