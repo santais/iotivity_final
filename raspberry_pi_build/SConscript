@@ -75,7 +75,7 @@ if 'rt' in rpi_env.get('LIBS'):
     rpi_env.Append(LIBS = ['rt'])
 
 if env.get('TARGET_ARCH') == 'arm':
-	rpi_env.AppendUnique(CPPDEFINES = ['arm'])
+	rpi_env.AppendUnique(CPPDEFINES = ['ARM'])
 
 rpi_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall',  '-Wextra', '-fmessage-length=0', '-std=c++0x', '-Wno-error'])
 rpi_env.AppendUnique(LINKFLAGS = ['-Wl,--no-undefined'])
