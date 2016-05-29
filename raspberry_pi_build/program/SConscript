@@ -118,7 +118,7 @@ RpiMain = rpi_env.Program('LightResourceHosting', 'LightResourceHosting.cpp')
 
 #env.AppendTarget('resource_directory')
 
-SConscript('Constrained/SConscript')
+SConscript('constrained/SConscript')
 
 
 
