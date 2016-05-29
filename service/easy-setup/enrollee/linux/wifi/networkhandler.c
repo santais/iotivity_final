@@ -58,9 +58,11 @@ static bool ESActivateWifi()
 {
     printf("Connecting to network up the wifi\n");
 
-//    system("sudo wpa_supplicant -Dnl80211 -iwlan0 -c/home/pi/wpa.con");
+#ifdef ARM
+    system("sudo wpa_supplicant -Dnl80211 -iwlan0 -c/home/pi/wpa.con");
    // Optain an IP address
-   // system("sudo dhclient wlan0");
+    system("sudo dhclient wlan0");
+#endif ARM
     struct ifaddrs *ifaddr, *ifa;
     int family, s;
     char host[NI_MAXHOST];
