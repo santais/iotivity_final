@@ -58,11 +58,11 @@ int TVResource::createResource()
         return -1;
     }
     // Using default parameters
-    std::vector<std::string> resource_types = {OIC_DEVICE_TV, OIC_TYPE_MEDIA_SOURCE, MP_TYPE_TV_MODE};
+    std::vector<std::string> resource_types = {OIC_DEVICE_TV, OIC_TYPE_MEDIA_SOURCE, OIC_TYPE_BINARY_SWITCH};
 
     try
     {
-    m_resource = std::make_shared<RPIRCSResourceObject>(RPIRCSResourceObject(m_uri,
+        m_resource = std::make_shared<RPIRCSResourceObject>(RPIRCSResourceObject(m_uri,
                             std::move(resource_types), std::move(std::vector<std::string> {OC_RSRVD_INTERFACE_DEFAULT})));
     }
     catch(RCSInvalidParameterException e)
@@ -141,13 +141,15 @@ void TVResource::setAttributes()
     RCSResourceAttributes::Value sourceType((int) 1);
     RCSResourceAttributes::Value status((bool) false);
 
-    //mpTVMode
-    RCSResourceAttributes::Value tvMode((std::string) "TV_OFF");
+    //binarySwitch
+    RCSResourceAttributes::Value state((bool) false);
+
 
     m_resource->addAttribute("sourceName", sourceName);
     m_resource->addAttribute("sourceNumber", sourceNumber);
     m_resource->addAttribute("sourceType", sourceType);
     m_resource->addAttribute("status", status);
 
-    m_resource->addAttribute("tvMode", tvMode);
+    // Binary State
+    m_resource->addAttribute("state", state);
 }

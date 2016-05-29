@@ -124,6 +124,7 @@ ESResult ESInitEnrollee(OCConnectivityType networkType, const char *ssid, const 
         ESEnrolleeEventCallback cb)
 {
     OIC_LOG(INFO, ES_ENROLLEE_TAG, "ESInitEnrollee IN");
+
     if(!ESEnrolleeValidateParam(networkType,ssid,passwd,cb))
     {
         OIC_LOG(ERROR, ES_ENROLLEE_TAG,

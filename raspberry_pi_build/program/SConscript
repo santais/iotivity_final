@@ -5,7 +5,10 @@ if env.get('RELEASE'):
 	env.AppendUnique(CPPDEFINES = ['NDEBUG'])
 else:
 	env.AppendUnique(CCFLAGS = ['-g'])
-	env.AppendUnique(CPPDEFINES = ['DEBUG'])
+
+
+if env.get('LOGGING'):
+    env.AppendUnique(CPPDEFINES = ['-DTB_LOG'])
 
 lib_env = env.Clone()
 SConscript(env.get('SRC_DIR') + '/service/third_party_libs.scons', 'lib_env')
@@ -19,7 +22,11 @@ target_arch = env.get('TARGET_ARCH')
 ######################################################################
 rpi_env.AppendUnique(CPPPATH = ['../include'])
 rpi_env.AppendUnique(CPPPATH = ['../../resource/include'])
+rpi_env.AppendUnique(CPPPATH = ['../../resource/csdk/logger/include'])
 rpi_env.AppendUnique(CPPPATH = ['../../resource/csdk/stack/include'])
+rpi_env.AppendUnique(CPPPATH = ['../../resource/csdk/stack/include/internal'])
+rpi_env.AppendUnique(CPPPATH = ['../../resource/csdk/connectivity/api'])
+rpi_env.AppendUnique(CPPPATH = ['../../resource/oc_logger/include'])
 
 # Services
 rpi_env.AppendUnique(CPPPATH = ['../../service/resource-encapsulation/include'])
@@ -28,17 +35,14 @@ rpi_env.AppendUnique(CPPPATH = ['../../service/resource-encapsulation/src/common
 rpi_env.AppendUnique(CPPPATH = ['../../service/resource-directory/include'])
 rpi_env.AppendUnique(CPPPATH = ['../../service/controller/include'])
 rpi_env.AppendUnique(CPPPATH = ['../../service/resource-directory/include'])
-
-
-	
+rpi_env.AppendUnique(CPPPATH = ['../../service/easy-setup/inc'])
+rpi_env.AppendUnique(CPPPATH = ['../../service/easy-setup/enrollee/inc'])
 
 if target_arch in 'arm':
 	rpi_env.AppendUnique(LIBS = [
 		'rcs_client',
 		'rcs_server',
 		'rcs_common',
-		'oc',
-		'octbstack',
 		'oc_logger',
 		'connectivity_abstraction',
 		'libcoap',
@@ -46,38 +50,34 @@ if target_arch in 'arm':
 		'libcontroller',		# Has the configuration files
 		'librpi',
 		'wiringPi',
-		'resource_directory'
+		'ESEnrolleeSDK'
 		])
 else:
+	print' TARGET IS x86 '
 	rpi_env.AppendUnique(LIBS = [
 		'rcs_client',
 		'rcs_server',
 		'rcs_common',
-		'oc',
-		'octbstack',
 		'oc_logger',
 		'connectivity_abstraction',
 		'libcoap',
 		'resource_directory',
 		'libcontroller',		# Has the configuration files
 		'librpi',
-		'resource_directory'
+		'ESEnrolleeSDK'
 		])
 
-#rpi_env.PrependUnique(LIBS = 'resource_directory')
+rpi_env.PrependUnique(LIBS = ['resource_directory', 'oc', 'octbstack'])
 
 if env.get('SECURED') == '1':
     rpi_env.AppendUnique(LIBS = ['tinydtls'])
 if 'rt' in rpi_env.get('LIBS'):
     rpi_env.Append(LIBS = ['rt'])
 
-if env.get('SECURED') == '1':
-    rpi_env.AppendUnique(LIBS = ['tinydtls'])
-if 'rt' in rpi_env.get('LIBS'):
-    rpi_env.Append(LIBS = ['rt'])
+rpi_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-Wextra', '-fmessage-length=0', '-std=c++0x', '-Wno-error'])
+rpi_env.AppendUnique(LIBPATH = [env.get('BUILD_DIR')])
+rpi_env.AppendUnique(RPATH = [env.get('BUILD_DIR')])
 
-if target_os not in ['windows', 'winrt']:
-	rpi_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-Wextra', '-fmessage-length=0', '-std=c++0x', '-Wno-error'])
 
 if target_os not in ['darwin', 'ios', 'windows', 'winrt']:
 	rpi_env.AppendUnique(LINKFLAGS = ['-Wl,--no-undefined'])
@@ -110,9 +110,15 @@ RpiMain = rpi_env.Program('TVResource', 'tvResource.cpp')
 RpiMain = rpi_env.Program('ButtonLightResource', 'ButtonLightResource.cpp')
 
 RpiMain = rpi_env.Program('LightResourceHosting', 'LightResourceHosting.cpp')
-RpiMain = rpi_env.Program('LightResourceConstrained', 'LightResourceConstrained.cpp')
+#rpi_constrained = rpi_env.Program('LightResourceConstrained', 'LightResourceConstrained.cpp')
 
-rpi_env.InstallTarget(RpiMain, 'resource_test')
+#rpi_env.InstallTarget(RpiMain, 'resource_test')
+
+#Alias("resource_directory", rpi_constrained)
+
+#env.AppendTarget('resource_directory')
+
+SConscript('constrained/SConscript')
 
 
 

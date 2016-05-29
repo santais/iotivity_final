@@ -19,7 +19,11 @@ target_transport = env.get('TARGET_TRANSPORT')
 ######################################################################
 rpi_env.AppendUnique(CPPPATH = ['include'])
 rpi_env.AppendUnique(CPPPATH = ['../resource/include'])
+rpi_env.AppendUnique(CPPPATH = ['../resource/csdk/logger/include'])
 rpi_env.AppendUnique(CPPPATH = ['../resource/csdk/stack/include'])
+rpi_env.AppendUnique(CPPPATH = ['../resource/csdk/stack/include/internal'])
+rpi_env.AppendUnique(CPPPATH = ['../resource/csdk/connectivity/api'])
+rpi_env.AppendUnique(CPPPATH = ['../resource/oc_logger/include'])
 
 # Services
 rpi_env.AppendUnique(CPPPATH = ['../service/resource-encapsulation/include'])
@@ -28,6 +32,10 @@ rpi_env.AppendUnique(CPPPATH = ['../service/resource-encapsulation/src/common/ex
 rpi_env.AppendUnique(CPPPATH = ['../service/resource-directory/include'])
 rpi_env.AppendUnique(CPPPATH = ['../service/controller/include'])
 rpi_env.AppendUnique(CPPPATH = ['../service/resource-directory/include'])
+rpi_env.AppendUnique(CPPPATH = ['../service/easy-setup/inc'])
+rpi_env.AppendUnique(CPPPATH = ['../service/easy-setup/enrollee/inc'])
+
+
 rpi_env.AppendUnique(CPPPATH = ['../resource/csdk/stack/include/internal'])
 rpi_env.AppendUnique(CPPPATH = ['../resource/csdk/stack/include'])
 rpi_env.AppendUnique(CPPPATH = ['../resource/csdk/connectivity/api'])
