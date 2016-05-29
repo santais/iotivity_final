@@ -35,6 +35,8 @@ rpi_env.AppendUnique(CPPPATH = ['../../service/resource-encapsulation/src/common
 rpi_env.AppendUnique(CPPPATH = ['../../service/resource-directory/include'])
 rpi_env.AppendUnique(CPPPATH = ['../../service/controller/include'])
 rpi_env.AppendUnique(CPPPATH = ['../../service/resource-directory/include'])
+rpi_env.AppendUnique(CPPPATH = ['../../service/easy-setup/inc'])
+rpi_env.AppendUnique(CPPPATH = ['../../service/easy-setup/enrollee/inc'])
 
 if target_arch in 'arm':
 	rpi_env.AppendUnique(LIBS = [
@@ -47,7 +49,8 @@ if target_arch in 'arm':
 		'resource_directory',
 		'libcontroller',		# Has the configuration files
 		'librpi',
-		'wiringPi'
+		'wiringPi',
+		'ESEnrolleeSDK'
 		])
 else:
 	print' TARGET IS x86 '
@@ -60,7 +63,8 @@ else:
 		'libcoap',
 		'resource_directory',
 		'libcontroller',		# Has the configuration files
-		'librpi'
+		'librpi',
+		'ESEnrolleeSDK'
 		])
 
 rpi_env.PrependUnique(LIBS = ['resource_directory', 'oc', 'octbstack'])

@@ -24,6 +24,7 @@
 #include "oic_string.h"
 
 #include "rd_client.h"
+#include "easysetup.h"
 
 #include "LightResource.h"
 
@@ -36,54 +37,18 @@ uint16_t rdPort;
 
 bool g_rdInitialized = false;
 
-void registerLocalResources()
-{
-    std::string resourceURI_thermostat = "/a/thermostat";
-    std::string resourceTypeName_thermostat = "core.thermostat";
-    std::string resourceURI_light = "/a/light";
-    std::string resourceTypeName_light = "oic.d.light";
-    std::string resourceInterface = DEFAULT_INTERFACE;
-    uint8_t resourceProperty = OC_DISCOVERABLE;
-/*
-    OCStackResult result = OCPlatform::registerResource(g_curResource_t,
-                           resourceURI_thermostat,
-                           resourceTypeName_thermostat,
-                           resourceInterface,
-                           NULL,
-                           resourceProperty);
+/**
+ * @var ssid
+ * @brief Target SSID of the Soft Access point to which the device has to connect
+ */
+static char g_ssid[] = "EasySetup123";
 
-    if (OC_STACK_OK != result)
-    {
-        throw std::runtime_error(
-            std::string("Device Resource failed to start") + std::to_string(result));
-    }
-*/
-    OCStackResult result = OCPlatform::registerResource(g_curResource_l,
-                                          resourceURI_light,
-                                          resourceTypeName_light,
-                                          resourceInterface,
-                                          NULL,
-                                          resourceProperty);
+/**
+ * @var passwd
+ * @brief Password of the Soft Access point to which the device has to connect
+ */
+static char g_passwd[] = "EasySetup123";
 
-    if (OC_STACK_OK != result)
-    {
-        throw std::runtime_error(
-            std::string("Device Resource failed to start") + std::to_string(result));
-    }
-}
-
-void printHelp()
-{
-    std::cout << std::endl;
-    std::cout << "********************************************" << std::endl;
-    std::cout << "*  method Type : 1 - Discover RD           *" << std::endl;
-    std::cout << "*  method Type : 2 - Publish               *" << std::endl;
-    std::cout << "*  method Type : 3 - Update                *" << std::endl;
-    std::cout << "*  method Type : 4 - Delete                *" << std::endl;
-    std::cout << "*  method Type : 5 - Status                *" << std::endl;
-    std::cout << "********************************************" << std::endl;
-    std::cout << std::endl;
-}
 
 int biasFactorCB(char addr[MAX_ADDR_STR_SIZE], uint16_t port)
 {
@@ -93,6 +58,50 @@ int biasFactorCB(char addr[MAX_ADDR_STR_SIZE], uint16_t port)
     g_rdInitialized = true;
     return 0;
 }
+
+void EventCallbackInApp(ESResult esResult, ESEnrolleeState enrolleeState)
+{
+    printf("Easy setup event callback\n");
+
+    if(esResult == ES_OK)
+    {
+        if(enrolleeState == ES_ON_BOARDED_STATE)
+        {
+            printf("Device is successfully OnBoared on Adhoc network\n");
+        }
+        else if (enrolleeState == ES_PROVISIONED_STATE)
+        {
+            printf("Device is provisioned with target network's credentials\n");
+        }
+        else if (enrolleeState == ES_ON_BOARDED_TARGET_NETWORK_STATE)
+        {
+            printf("Device is onboarded/connected with target network\n");
+        }
+        else
+        {
+            printf("Wrong state !! Easy setup is failed at Enrollee state = %d\n",enrolleeState);
+        }
+    }
+    else
+    {
+        printf("Easy stup is failed at Enrollee state = %d\n",enrolleeState);;
+    }
+
+}
+
+
+ESResult startEasySetup()
+{
+    printf("StartEasySetup and onboarding started..\n");
+
+    if(ESInitEnrollee(CT_ADAPTER_IP, g_ssid, g_passwd, false, EventCallbackInApp) == ES_ERROR)
+    {
+        printf("StartEasySetup and onboarding Fail!!\n");
+        return ES_ERROR;
+    }
+    ES_OK;
+}
+
 
 int main()
 {
@@ -109,36 +118,19 @@ int main()
     }
 
     std::cout << "Created Platform..." << std::endl;
-/*
-    try
-    {
-        registerLocalResources();
-    }
-    catch (std::runtime_error e)
-    {
-        std::cout << "Caught OCException [Code: " << e.what() << std::endl;
-    }*/
 
     while (1)
     {
         sleep(2);
-/*
-        if (/*g_curResource_t == NULL || g_curResource_l == NULL)
+
+        // Initialize easy setup
+        if(startEasySetup() != ES_OK)
         {
-            continue;
+            std::cout << "Error initialzing starteasy setup";
+            sleep(2);
+            return -1;
         }
-        printHelp();
 
-        in = 0;
-        std::cin >> in;
-
-        if (std::cin.fail())
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid input type, please try again" << std::endl;
-            continue;
-        }*/
         if(!g_rdInitialized) 
         {
             try
