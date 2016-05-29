@@ -60,7 +60,7 @@ static bool ESActivateWifi()
 
 #ifdef ARM
     system("sudo wpa_supplicant -Dnl80211 -iwlan0 -c/home/pi/wpa.con");
-   // Optain an IP address
+   // Optain an IP address and do something
     system("sudo dhclient wlan0");
 #endif ARM
     struct ifaddrs *ifaddr, *ifa;
