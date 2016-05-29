@@ -56,7 +56,7 @@ typedef struct
     //byte mac[6];
 } NetworkInfo;
 
-void ConnectToWiFiNetwork(const char *ssid, const char *pass,
+bool ConnectToWiFiNetwork(const char *ssid, const char *pass,
                                                             ESEnrolleeNetworkEventCallback);
 ESResult getCurrentNetworkInfo(OCConnectivityType targetType, NetworkInfo *info);
 
