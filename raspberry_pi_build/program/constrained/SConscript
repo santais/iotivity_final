@@ -32,7 +32,6 @@ rd_sample_app_env = lib_env.Clone()
 ######################################################################
 # Build flags
 ######################################################################
-<<<<<<< HEAD:raspberry_pi_build/program/Constrained/SConscript
 rd_sample_app_env.AppendUnique(CPPPATH = ['/home/markpovlsen/Documents/iotivity/service/resource-directory/include'])
 rd_sample_app_env.AppendUnique(CPPPATH = ['../../../service/easy-setup/inc'])
 rd_sample_app_env.AppendUnique(CPPPATH = ['../../../service/easy-setup/enrollee/inc'])
