@@ -1,4 +1,4 @@
-/******************************************************************
+	/******************************************************************
  *
  * Copyright 2015 Samsung Electronics All Rights Reserved.
  *
@@ -69,6 +69,7 @@ void createWpaConf()
     snprintf(buf, sizeof buf, "%s%s%s%s%s", "sudo sh -c 'wpa_passphrase \"", gSsid, "\" ", gPass, " \> /etc/wpa.conf'");
     printf("%s\n", buf);
     system(buf);
+    sleep(0.5);
 }
 
 static bool ESConnectToWiFi()
@@ -126,6 +127,7 @@ static void ESActivateWifi()
     {
         printf("\n\n\tThread already exist! Cancelling\n\n");
         pthread_cancel(g_wpaSupplicantThread);
+	system("sudo killall wpa_supplicant");
     }
 
     if(pthread_create(&g_wpaSupplicantThread, NULL, wpaSupplicantThread, NULL))
@@ -148,8 +150,8 @@ static bool start()
     ESActivateWifi();
     while(!ESConnectToWiFi())
     {
-        printf("Unable to connect to network. Retrying...\n");
-        sleep(2);
+    //    printf("Unable to connect to network. Retrying...\n");
+    //    sleep(2);
     }
     return true;
 }
