@@ -52,6 +52,8 @@ ESEnrolleeNetworkEventCallback gNetworkEventCb;
 
 static bool g_connectedToWiFi = false;
 
+pthread_t g_wpaSupplicantThread;
+
 void *wpaSupplicantThread(void *no)
 {
     printf("Connecting to network up the wifi\n");
@@ -120,8 +122,13 @@ static bool ESConnectToWiFi()
  */
 static void ESActivateWifi()
 {
-    pthread_t thread_handle;
-    if(pthread_create(&thread_handle, NULL, wpaSupplicantThread, NULL))
+    if(g_wpaSupplicantThread)
+    {
+        printf("\n\n\tThread already exist! Cancelling\n\n");
+        pthread_cancel(g_wpaSupplicantThread);
+    }
+
+    if(pthread_create(&g_wpaSupplicantThread, NULL, wpaSupplicantThread, NULL))
     {
 	printf("Thread creation failed \n");
         return false;
