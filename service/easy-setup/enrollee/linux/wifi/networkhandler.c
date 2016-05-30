@@ -42,6 +42,7 @@
 #include <string.h>
 #include <pthread.h>
 
+
 #define LOG_TAG "LINUX ES"
 
 const char *gSsid = "EasySetup123";
@@ -55,9 +56,17 @@ void *wpaSupplicantThread(void *no)
 {
     printf("Connecting to network up the wifi\n");
     
+    system("sudo wpa_supplicant -Dnl80211 -iwlan0 -c/etc/wpa.conf");
+}
 
-//#ifdef ARM
-    system("sudo wpa_supplicant -Dnl80211 -iwlan0 -c/home/pi/wpa.conf");
+void createWpaConf()
+{
+    char buf[150];
+    // Remove previous wpa config files
+    system("sudo rm /etc/wpa.conf");
+    snprintf(buf, sizeof buf, "%s%s%s%s%s", "sudo sh -c 'wpa_passphrase \"", gSsid, "\" ", gPass, " \> /etc/wpa.conf'");
+    printf("%s\n", buf);
+    system(buf);
 }
 
 static bool ESConnectToWiFi()
@@ -128,6 +137,7 @@ static void ESActivateWifi()
 static bool start()
 {
     OIC_LOG(INFO, LOG_TAG, "START");
+    createWpaConf();
     ESActivateWifi();
     while(!ESConnectToWiFi())
     {
