@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <pthread.h>
 
 #define LOG_TAG "LINUX ES"
 
@@ -50,19 +51,17 @@ ESEnrolleeNetworkEventCallback gNetworkEventCb;
 
 static bool g_connectedToWiFi = false;
 
-/*
- * All the functions defined in this file are stub functions to be implemented by the end user of
- * Easysetup Enrollee applications.
- */
-static bool ESActivateWifi()
+void *wpaSupplicantThread(void *no)
 {
     printf("Connecting to network up the wifi\n");
+    
 
-#ifdef ARM
-    system("sudo wpa_supplicant -Dnl80211 -iwlan0 -c/home/pi/wpa.con");
-   // Optain an IP address and do something
-    system("sudo dhclient wlan0");
-#endif ARM
+//#ifdef ARM
+    system("sudo wpa_supplicant -Dnl80211 -iwlan0 -c/home/pi/wpa.conf");
+}
+
+static bool ESConnectToWiFi()
+{
     struct ifaddrs *ifaddr, *ifa;
     int family, s;
     char host[NI_MAXHOST];
@@ -81,7 +80,7 @@ static bool ESActivateWifi()
 
         s=getnameinfo(ifa->ifa_addr,sizeof(struct sockaddr_in),host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
 
-        if((strcmp(ifa->ifa_name,"eno16777736")==0)&&(ifa->ifa_addr->sa_family==AF_INET))
+        if((strcmp(ifa->ifa_name,"wlan0")==0)&&(ifa->ifa_addr->sa_family==AF_INET))
         { //eno16777736
             if (s != 0)
             {
@@ -100,16 +99,37 @@ static bool ESActivateWifi()
 
     if(g_connectedToWiFi)
     {
+	
         return true;
     }
-
     return false;
+}
+
+/*
+ * All the functions defined in this file are stub functions to be implemented by the end user of
+ * Easysetup Enrollee applications.
+ */
+static void ESActivateWifi()
+{
+    pthread_t thread_handle;
+    if(pthread_create(&thread_handle, NULL, wpaSupplicantThread, NULL))
+    {
+	printf("Thread creation failed \n");
+        return false;
+    }
+
+   // Optain an IP address and do something
+    system("sudo iw wlan0 link");
+    system("sudo dhclient wlan0");
+
+    return true;
 }
 
 static bool start()
 {
     OIC_LOG(INFO, LOG_TAG, "START");
-    while(!ESActivateWifi())
+    ESActivateWifi();
+    while(!ESConnectToWiFi())
     {
         printf("Unable to connect to network. Retrying...\n");
         sleep(2);

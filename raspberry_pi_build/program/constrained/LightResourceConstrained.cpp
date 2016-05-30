@@ -55,6 +55,9 @@ static char g_passwd[] = "EasySetup123";
  */
 LightResource g_lightResource;
 
+
+void *listeningFunc(void *);
+
 int biasFactorCB(char addr[MAX_ADDR_STR_SIZE], uint16_t port)
 {
     OICStrcpy(rdAddress, MAX_ADDR_STR_SIZE, addr);
@@ -80,9 +83,9 @@ void EventCallbackInApp(ESResult esResult, ESEnrolleeState enrolleeState)
             g_provisionInitialized = true;
         }
         else if (enrolleeState == ES_ON_BOARDED_TARGET_NETWORK_STATE)
-            g_provisionInitialized = true;
         {
             printf("Device is onboarded/connected with target network\n");
+	    g_provisionInitialized = true;
         }
         else
         {
@@ -125,22 +128,45 @@ void ESInitResources()
         std::cerr << "Init provisioning failed" << std::endl;
         return;
     }
+
+    pthread_t thread_handle;
+    if(pthread_create(&thread_handle, NULL, listeningFunc, NULL))
+    {
+	std::cerr << "Error creating thread" << std::endl;
+    }
+
+    std::cout << "Provisiong Resource Init Complete" << std::endl;
+}
+
+void *listeningFunc(void* non)
+{
+    OCStackResult result;
+  
+    while(true)
+    {
+    	result = OCProcess();
+        if(result != OC_STACK_OK)
+	{
+	     printf("OCSTACK ERROR\n");
+	}
+    }
+    return NULL;
 }
 
 int main()
 {
     int in;
-    PlatformConfig cfg;
+ //   PlatformConfig cfg;
 
-    OCPlatform::Configure(cfg);
+//    OCPlatform::Configure(cfg);
 
    // LightResource lightResource;
    // lightResource.createResource();
-    if(lightResource.getHandle() == NULL) 
+   /* if(g_lightResource.getHandle() == NULL) 
     {
         std::cout << "Light resource handle is null" << std::endl;
     }
-
+*/
     std::cout << "Created Platform..." << std::endl;
 
     while (1)
@@ -160,7 +186,9 @@ int main()
 
         while(!g_provisionInitialized)
         {
+
             sleep(1);
+	    std::cout << "Waiting on provisioning..." << std::endl;
         }
         std::cout << "Provision complete" << std::endl;
 
