@@ -80,7 +80,7 @@ void EventCallbackInApp(ESResult esResult, ESEnrolleeState enrolleeState)
         else if (enrolleeState == ES_PROVISIONED_STATE)
         {
             printf("Device is provisioned with target network's credentials\n");
-            g_provisionInitialized = true;
+            //g_provisionInitialized = true;
         }
         else if (enrolleeState == ES_ON_BOARDED_TARGET_NETWORK_STATE)
         {
@@ -198,6 +198,7 @@ int main()
         {
             try
             {
+		std::cout << "Searching for RD server!" << std::endl;
                 while(!g_rdInitialized) 
                 {
                     OCRDDiscover(biasFactorCB);
