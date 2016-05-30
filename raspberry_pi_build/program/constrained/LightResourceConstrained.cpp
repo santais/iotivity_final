@@ -173,7 +173,7 @@ int main()
     {
         sleep(2);
 
-        // Initialize easy setup
+    /*    // Initialize easy setup
         if(startEasySetup() != ES_OK)
         {
             std::cout << "Error initialzing starteasy setup";
@@ -191,7 +191,7 @@ int main()
 	    std::cout << "Waiting on provisioning..." << std::endl;
         }
         std::cout << "Provision complete" << std::endl;
-
+*/
         g_lightResource.createResource();
 
         if(!g_rdInitialized) 
