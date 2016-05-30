@@ -77,8 +77,10 @@ void EventCallbackInApp(ESResult esResult, ESEnrolleeState enrolleeState)
         else if (enrolleeState == ES_PROVISIONED_STATE)
         {
             printf("Device is provisioned with target network's credentials\n");
+            g_provisionInitialized = true;
         }
         else if (enrolleeState == ES_ON_BOARDED_TARGET_NETWORK_STATE)
+            g_provisionInitialized = true;
         {
             printf("Device is onboarded/connected with target network\n");
         }
