@@ -164,6 +164,8 @@ int main()
         }
         std::cout << "Provision complete" << std::endl;
 
+        g_lightResource.createResource();
+
         if(!g_rdInitialized) 
         {
             try
