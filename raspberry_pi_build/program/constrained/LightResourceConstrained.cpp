@@ -50,6 +50,8 @@ static char g_ssid[] = "EasySetup123";
 static char g_passwd[] = "EasySetup123";
 
 
+LightResource g_lightResource;
+
 int biasFactorCB(char addr[MAX_ADDR_STR_SIZE], uint16_t port)
 {
     OICStrcpy(rdAddress, MAX_ADDR_STR_SIZE, addr);
@@ -103,6 +105,11 @@ ESResult startEasySetup()
 }
 
 
+void ESInitResources()
+{
+	
+}
+
 int main()
 {
     int in;
@@ -110,8 +117,8 @@ int main()
 
     OCPlatform::Configure(cfg);
 
-    LightResource lightResource;
-    lightResource.createResource();
+   // LightResource lightResource;
+   // lightResource.createResource();
     if(lightResource.getHandle() == NULL) 
     {
         std::cout << "Light resource handle is null" << std::endl;
@@ -141,7 +148,7 @@ int main()
                     sleep(2);
                 }
 
-                OCRDPublish(rdAddress, rdPort, 1, lightResource.getHandle());
+                OCRDPublish(rdAddress, rdPort, 1, g_lightResource.getHandle());
 
             }
             catch (OCException e)
