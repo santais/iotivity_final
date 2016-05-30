@@ -35,6 +35,7 @@ OCResourceHandle g_curResource_l = NULL;
 char rdAddress[MAX_ADDR_STR_SIZE];
 uint16_t rdPort;
 
+bool g_provisionInitialized = false;
 bool g_rdInitialized = false;
 
 /**
@@ -49,7 +50,9 @@ static char g_ssid[] = "EasySetup123";
  */
 static char g_passwd[] = "EasySetup123";
 
-
+/**
+ * @brief LightResource
+ */
 LightResource g_lightResource;
 
 int biasFactorCB(char addr[MAX_ADDR_STR_SIZE], uint16_t port)
@@ -107,7 +110,19 @@ ESResult startEasySetup()
 
 void ESInitResources()
 {
-	
+    std::cout << "Starting Enrollee Provisioning" << std::endl;
+
+    if(OCInit(NULL, 0, OC_SERVER) != OC_STACK_OK)
+    {
+        std::cerr << "OCSTACK init error!" << std::endl;
+        return;
+    }
+
+    if(ESInitProvisioning() == ES_ERROR)
+    {
+        std::cerr << "Init provisioning failed" << std::endl;
+        return;
+    }
 }
 
 int main()
@@ -137,6 +152,15 @@ int main()
             sleep(2);
             return -1;
         }
+
+        std::cout << "OnBoarding complete" << std::endl;
+        ESInitResources();
+
+        while(!g_provisionInitialized)
+        {
+            sleep(1);
+        }
+        std::cout << "Provision complete" << std::endl;
 
         if(!g_rdInitialized) 
         {
