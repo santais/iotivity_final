@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string>
 
-static const int DELAY_TIME_INPUT_THREAD = 10;      // ms
+static const int DELAY_TIME_INPUT_THREAD = 1;      // ms
 
 // Blinking LED
 static const char LED_PIN = 13;
@@ -31,10 +31,9 @@ static const char TEST_LED_PIN = 5; // PWM Pin
 static const char TEST_BUT_PIN = 2;	
 static const char TEMPERATURE_PIN_IN = A2;
 
-static const float AREF = 3.3;
-static const int ADC_RES = 1024;
-static const float TEMPERATURE_CONSTANT = 10 / ((AREF * 100) / ADC_RES);
-static const int TEMPERATURE_OFFSET = -20;
+static const float TEMPERATURE_CONSTANT = 0.08;
+static const float TEMPERATURE_DIFFERENCE = 0.4;
+static float g_prevTempReading;
 
 static int g_prevButtonReading = false;
 #define TAG "ArduinoServer"
@@ -247,9 +246,18 @@ void temperatureIOHandler(OCRepPayloadValue *attribute, OCIOPort *port, OCResour
     // Read the ADC value
     if(port != NULL)
     {   
-        analogReadResolution(10);
         int reading = analogRead(port->pin);
-        attribute->d = (reading / TEMPERATURE_CONSTANT) - TEMPERATURE_OFFSET;
+        attribute->d = reading * TEMPERATURE_CONSTANT;
+
+        if(attribute->d >= g_prevTempReading + TEMPERATURE_DIFFERENCE || attribute->d <= g_prevTempReading - TEMPERATURE_DIFFERENCE)
+        {
+            Serial.print("Temperature is: ");
+            Serial.println(attribute->d);
+            OIC_LOG(DEBUG, TAG, "Notifying temperature");
+            OCNotifyAllObservers(handle, OC_MEDIUM_QOS);
+
+            g_prevTempReading = attribute->d;
+        }
     }
 }
 
@@ -304,7 +312,7 @@ void createTemperature()
     port.type = IN;
 
     // Temperature resource
-    g_temperatureResource = createResource("/arduino/temperatureSensor", OIC_DEVICE_SENSOR, OC_RSRVD_INTERFACE_DEFAULT,
+    g_temperatureResource = createResource1("/arduino/temperatureSensor/hosting", OIC_DEVICE_SENSOR, OC_RSRVD_INTERFACE_DEFAULT,
                                                       (OC_DISCOVERABLE | OC_OBSERVABLE), temperatureIOHandler, &port);
     analogReference(AR_DEFAULT);
     if(g_temperatureResource != NULL)
@@ -319,10 +327,11 @@ void createTemperature()
 
     g_temperatureResource->name = "LM35 Temperature Sensor";
 
-    OCStackResult result = addType(g_temperatureResource, OIC_TYPE_TEMPERATURE);
+    OCStackResult result = addType1(g_temperatureResource, OIC_TYPE_TEMPERATURE);
+    result = addType1(g_temperatureResource, OIC_TYPE_RESOURCE_HOST);
 
     // READ only interface
-    result = addInterface(g_temperatureResource, OC_RSRVD_INTERFACE_READ);
+    result = addInterface1(g_temperatureResource, OC_RSRVD_INTERFACE_READ);
 
     OCRepPayloadValue value;
     value.name = "Temperature";
@@ -331,7 +340,86 @@ void createTemperature()
     value.type = OCREP_PROP_DOUBLE;
     result = addAttribute(&g_temperatureResource->attribute, &value);
 
-    analogReadResolution(10);
+    analogReadResolution(12);
+}
+
+void createLightResource()
+{
+    OCIOPort portLight;
+    portLight.pin = TEST_LED_PIN; // LED_PIN for debug
+    portLight.type = OUT;
+
+    // Light resource
+    g_lightResource = createResource1("/arduino/light", OIC_DEVICE_LIGHT, OC_RSRVD_INTERFACE_DEFAULT,
+                                              (OC_DISCOVERABLE | OC_OBSERVABLE), lightIOHandler, &portLight);
+    
+    if(g_lightResource != NULL)
+    {
+        OIC_LOG(INFO, TAG, "Light resource created successfully");
+        Serial.println((int)g_lightResource->handle, HEX);
+    }
+    else
+    {
+        OIC_LOG(DEBUG, TAG, "Unable to create light resource");
+    }
+    g_lightResource->name = "Mark's Light";
+
+    addType1(g_lightResource, OIC_TYPE_BINARY_SWITCH);
+    addType1(g_lightResource, OIC_TYPE_LIGHT_BRIGHTNESS);
+
+    OCRepPayloadValue powerValue;
+    powerValue.b = true;
+    powerValue.name = "power";
+    powerValue.next = NULL;
+    powerValue.type = OCREP_PROP_BOOL;
+    addAttribute(&g_lightResource->attribute, &powerValue);
+
+    
+    OCRepPayloadValue brightnessValue;
+    brightnessValue.i = 255;
+    brightnessValue.name = "brightness";
+    brightnessValue.next = NULL;
+    brightnessValue.type = OCREP_PROP_INT;
+    addAttribute(&g_lightResource->attribute, &brightnessValue);
+
+}
+
+void createButtonResource()
+{
+   /** Create Button Resource **/
+    OCIOPort buttonPort;
+    buttonPort.pin = TEST_BUT_PIN;
+    buttonPort.type = IN;
+
+    g_buttonResource = createResource1("/arduino/button", OIC_DEVICE_BUTTON, OC_RSRVD_INTERFACE_DEFAULT,
+                                            (OC_DISCOVERABLE | OC_OBSERVABLE), buttonIOHandler, &buttonPort);
+
+    if(g_buttonResource != NULL)
+    {
+        OIC_LOG(INFO, TAG, "Button resource created successfully");
+        int pointer;
+        Serial.println((int)g_buttonResource->handle, HEX);
+    }
+    else
+    {
+        OIC_LOG(ERROR, TAG, "Unable to create the button resource");
+    }
+
+    OCStackResult result = addType1(g_buttonResource, OIC_TYPE_BINARY_SWITCH);
+
+    result = addInterface1(g_buttonResource, OC_RSRVD_INTERFACE_READ);
+
+    if(result != OC_STACK_OK)
+    {
+        OIC_LOG(ERROR, TAG, "Can't add interface READ");
+    }
+
+    OCRepPayloadValue buttonValue;
+    buttonValue.b = false;
+    buttonValue.name = "state";
+    buttonValue.next = NULL;
+    buttonValue.type = OCREP_PROP_BOOL;
+    addAttribute(&g_buttonResource->attribute, &buttonValue);
 }
 
 //The setup function is called once at startup of the sketch
@@ -364,78 +452,9 @@ void setup()
 
     OIC_LOG(DEBUG, TAG, "Creating resource");
 
-    OCIOPort portLight;
-    portLight.pin = TEST_LED_PIN; // LED_PIN for debug
-    portLight.type = OUT;
-
-    // Light resource
-    g_lightResource = createResource("/arduino/light", OIC_DEVICE_LIGHT, OC_RSRVD_INTERFACE_DEFAULT,
-                                              (OC_DISCOVERABLE | OC_OBSERVABLE), lightIOHandler, &portLight);
-    
-    if(g_lightResource != NULL)
-    {
-        OIC_LOG(INFO, TAG, "Light resource created successfully");
-        Serial.println((int)g_lightResource->handle, HEX);
-    }
-    else
-    {
-        OIC_LOG(DEBUG, TAG, "Unable to create light resource");
-    }
-    g_lightResource->name = "Mark's Light";
-
-    addType(g_lightResource, OIC_TYPE_BINARY_SWITCH);
-    addType(g_lightResource, OIC_TYPE_LIGHT_BRIGHTNESS);
-
-    OCRepPayloadValue powerValue;
-    powerValue.b = true;
-    powerValue.name = "power";
-    powerValue.next = NULL;
-    powerValue.type = OCREP_PROP_BOOL;
-    addAttribute(&g_lightResource->attribute, &powerValue);
-
-    
-    OCRepPayloadValue brightnessValue;
-    brightnessValue.i = 255;
-    brightnessValue.name = "brightness";
-    brightnessValue.next = NULL;
-    brightnessValue.type = OCREP_PROP_INT;
-    addAttribute(&g_lightResource->attribute, &brightnessValue);
-
-    /** Create Button Resource **/
-    OCIOPort buttonPort;
-    buttonPort.pin = TEST_BUT_PIN;
-    buttonPort.type = IN;
-
-    g_buttonResource = createResource("/arduino/button", OIC_DEVICE_BUTTON, OC_RSRVD_INTERFACE_DEFAULT,
-                                            (OC_DISCOVERABLE | OC_OBSERVABLE), buttonIOHandler, &buttonPort);
-
-    if(g_buttonResource != NULL)
-    {
-        OIC_LOG(INFO, TAG, "Button resource created successfully");
-        int pointer;
-        Serial.println((int)g_buttonResource->handle, HEX);
-    }
-    else
-    {
-        OIC_LOG(ERROR, TAG, "Unable to create the button resource");
-    }
-
-    OCStackResult result = addType(g_buttonResource, OIC_TYPE_BINARY_SWITCH);
-    result = addInterface(g_buttonResource, OC_RSRVD_INTERFACE_READ);
-
-    if(result != OC_STACK_OK)
-    {
-        OIC_LOG(ERROR, TAG, "Can't add interface READ");
-    }
-
-    OCRepPayloadValue buttonValue;
-    buttonValue.b = false;
-    buttonValue.name = "state";
-    buttonValue.next = NULL;
-    buttonValue.type = OCREP_PROP_BOOL;
-    addAttribute(&g_buttonResource->attribute, &buttonValue);
-
     createTemperature();
+    createLightResource();
+    createButtonResource();
 
     if(OCStartPresence(OC_MAX_PRESENCE_TTL_SECONDS - 1) != OC_STACK_OK)
     {

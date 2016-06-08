@@ -164,7 +164,7 @@ OCEntityHandlerResult EntityHandlerCb(OCEntityHandlerFlag flag, OCEntityHandlerR
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OCEntityHandlerResponse response = { 0, 0, OC_EH_ERROR, 0, 0, { },{ 0 }, false };
     OCBaseResourceT *resource = (OCBaseResourceT*) callbackParam;
-    OCRepPayload* payload = NULL;
+    OCRepPayload* payload = getPayload(entityHandlerRequest, resource);
 
     // Check the request type
     if(entityHandlerRequest && (flag & OC_REQUEST_FLAG))
