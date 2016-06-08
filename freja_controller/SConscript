@@ -86,7 +86,7 @@ if 'rt' in controller_env.get('LIBS'):
     controller_env.Append(LIBS = ['rt'])
 
 if target_os not in ['windows', 'winrt']:
-	controller_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-fmessage-length=0', '-std=c++0x', '-Wno-error'])
+	controller_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-fmessage-length=0', '-std=c++0x', '-Wno-error', '-pthread'])
 
 if target_os not in ['darwin', 'ios', 'windows', 'winrt']:
 	controller_env.AppendUnique(LINKFLAGS = ['-Wl,--no-undefined'])
@@ -112,7 +112,8 @@ controller_src = [
 	'src/Controller.cpp',
 	'src/ResourceObject.cpp',
 	'src/DiscoveryManager.cpp',
-	'src/ConfigurationCollection.cpp'
+	'src/ConfigurationCollection.cpp',
+	'src/BuildingController.cpp'
 	]
 
 Controller_Static = controller_env.StaticLibrary('controller', controller_src)

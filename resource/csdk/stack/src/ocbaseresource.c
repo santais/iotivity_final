@@ -162,19 +162,14 @@ OCEntityHandlerResult EntityHandlerCb(OCEntityHandlerFlag flag, OCEntityHandlerR
                             void *callbackParam)
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
-    OCEntityHandlerResponse response = {0};
+    OCEntityHandlerResponse response = { 0, 0, OC_EH_ERROR, 0, 0, { },{ 0 }, false };
     OCBaseResourceT *resource = (OCBaseResourceT*) callbackParam;
     OCRepPayload* payload = NULL;
-
-    if(!payload)
-    {
-      OIC_LOG(ERROR, TAG, ("Failed to allocate Payload"));
-      return OC_EH_ERROR;
-    }
 
     // Check the request type
     if(entityHandlerRequest && (flag & OC_REQUEST_FLAG))
     {
+        OCRepPayloadDestroy(payload);
         ehResult = requestHandler(entityHandlerRequest, resource, &payload);
     }
 
@@ -245,6 +240,7 @@ void pushResorcetoList(OCBaseResourceT **head)
 OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInterface* interface,
                          uint8_t properties, OCIOHandler outputHandler, OCIOPort* port)
 {
+    printf("Inside createResource\n");
     // Create the resource
     OIC_LOG_V(DEBUG, TAG, "Creating resource with uri: %s\n", uri);
     OIC_LOG(DEBUG, TAG, "Entering createResource...");
@@ -279,7 +275,7 @@ OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInte
             resource->resourceProperties);
     OIC_LOG_V(DEBUG, TAG, "Created resource with OCStackResult: %s", res);
 
-    printf("Created resource with OCStackREsult: %s\n", res);
+    //printf("Created resource with OCStackREsult: %s", res);
 
     if(res != OC_STACK_OK) 
     {
@@ -351,6 +347,7 @@ OCBaseResourceT * createResource(char* uri, OCResourceType* type, OCResourceInte
 OCBaseResourceT * createResource1(char* uri, const char* type, const char* interface, uint8_t properties,
                                  OCIOHandler outputHandler, OCIOPort* port)
 {
+    printf("Inside createResource1\n");
     OCResourceType resourceType;
     resourceType.resourcetypename = (char*) type;
     resourceType.next = NULL;
@@ -673,10 +670,10 @@ OCEntityHandlerResult responseHandler(OCEntityHandlerResponse *response, OCEntit
   response->payload = (OCPayload*)payload;
   // Indicate that response is NOT in a persistent buffer
   response->persistentBufferFlag = 0;
-  response->numSendVendorSpecificHeaderOptions = 0;
+  /*response->numSendVendorSpecificHeaderOptions = 0;
   memset(response->sendVendorSpecificHeaderOptions, 0,
           sizeof response->sendVendorSpecificHeaderOptions);
-  memset(response->resourceUri, 0, sizeof response->resourceUri);
+  memset(response->resourceUri, 0, sizeof response->resourceUri);*/
 
   // Send the response
   OCStackResult stackResult = OCDoResponse(response);

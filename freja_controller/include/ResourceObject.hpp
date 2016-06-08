@@ -18,6 +18,7 @@ enum class ResourceDeviceType
     OIC_SPEAKER,
     OIC_TV,
     OIC_SENSOR,
+    OIC_TEMPERATURE_SENSOR,
     UNKNOWN_DEVICE
 };
 

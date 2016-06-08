@@ -55,7 +55,7 @@ namespace OIC { namespace Service
     OCStackResult Controller::start()
     {
         // Start the discoveryManager
-        const std::vector<std::string> types{OIC_DEVICE_LIGHT, OIC_DEVICE_BUTTON, OIC_DEVICE_SENSOR, OIC_DEVICE_FAN};
+        const std::vector<std::string> types{OIC_DEVICE_LIGHT, OIC_DEVICE_BUTTON, OIC_DEVICE_SENSOR, OIC_DEVICE_FAN, OIC_DEVICE_TV};
         m_discoveryTask = Controller::discoverResource(m_discoveryCallback, types);
 
         // Start the DiscoveryManager for BLE devices
@@ -121,7 +121,7 @@ namespace OIC { namespace Service
         // Create PlatformConfig object
         PlatformConfig cfg {
             OC::ServiceType::InProc,
-            OC::ModeType::Both,
+            OC::ModeType::Gateway,
             "0.0.0.0", // By setting to "0.0.0.0", it binds to all available interfaces
             0,         // Uses randomly available port
             OC::QualityOfService::LowQos 
@@ -184,17 +184,27 @@ namespace OIC { namespace Service
 
         if(this->isResourceLegit(resource))
         {
-            // Make new ResourceObject
-            ResourceObject::Ptr resourceObject = ResourceObject::Ptr(new ResourceObject(resource));
+            std::unordered_map<std::string, ResourceObject::Ptr>::const_iterator itr = m_resourceList.find (resource->getUri() + resource->getAddress());
 
-            if(m_resourceList.insert({resource->getUri() + resource->getAddress(), resourceObject}).second)
+            if ( itr == m_resourceList.end() )
             {
+                // Make new ResourceObject
+                ResourceObject::Ptr resourceObject = ResourceObject::Ptr(new ResourceObject(resource));
+
+                m_resourceList.insert({resource->getUri() + resource->getAddress(), resourceObject});
+
                 this->printResourceData(resource);
                 this->addResourceToScene(resource);
 
                 std::cout << "\tAdded device: " << resource->getUri() + resource->getAddress() << std::endl;
                 std::cout << "\tDevice successfully added to the list" << std::endl;
+
             }
+            else
+            {
+               std::cout << "Resource is already in the list" << std::endl;
+            }
+
         }
      }
 
@@ -420,11 +430,6 @@ namespace OIC { namespace Service
             {
                 m_sceneStart->addNewSceneAction(resource, "power", true);
                 m_sceneStop->addNewSceneAction(resource, "power", false);
-            }
-            else if(type.compare(MP_TYPE_TV_MODE) == 0)
-            {
-                m_sceneStart->addNewSceneAction(resource, "tvMode", "TV_ON");
-                m_sceneStop->addNewSceneAction(resource, "tvMode", "TV_OFF");
             }
         }
     }

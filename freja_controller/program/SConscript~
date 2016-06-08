@@ -67,7 +67,6 @@ controller_program_env.AppendUnique(LIBS = [
     'oc_logger',
     'connectivity_abstraction',
     'coap',
-    'pthread',
     'libTGMSDKLibrary',
     'resource_hosting'
     ])
@@ -75,10 +74,13 @@ controller_program_env.AppendUnique(LIBS = [
 if env.get('SECURED') == '1':
     controller_program_env.AppendUnique(LIBS = ['tinydtls'])
 
+if env.get('TARGET_OS') == 'linux':
+	controller_program_env.AppendUnique(LIBS = ['pthread'])
+
 if 'rt' in controller_program_env.get('LIBS'):
     controller_program_env.Append(LIBS = ['rt'])
 
-controller_program_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-fmessage-length=0', '-std=c++0x', '-Wno-error'])
+controller_program_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-fmessage-length=0', '-std=c++0x', '-Wno-error', ])
 
 ######################################################################
 # ##### Client #####
@@ -88,6 +90,8 @@ ControllerMain = controller_program_env.Program('controller_main', 'main.cpp')
 ControllerMain = controller_program_env.Program('buttonServer', 'buttonserver.cpp')
 ControllerMain = controller_program_env.Program('lightServer', 'lightserver.cpp')
 ControllerMain = controller_program_env.Program('fanServer', 'fanserver.cpp')
+ControllerMain = controller_program_env.Program('resourceDirectory', 'resourceDirectory.cpp')
+ControllerMain = controller_program_env.Program('buildingControllerMain', 'buildingControllerMain.cpp')
 
 
 controller_program_env.InstallTarget(ControllerMain, 'controller_main')

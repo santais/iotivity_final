@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string>
 
-static const int DELAY_TIME_INPUT_THREAD = 1;      // ms
+static const int DELAY_TIME_INPUT_THREAD = 200;      // ms
 
 // Blinking LED
 static const char LED_PIN = 13;
@@ -32,7 +32,7 @@ static const char TEST_BUT_PIN = 2;
 static const char TEMPERATURE_PIN_IN = A2;
 
 static const float TEMPERATURE_CONSTANT = 0.08;
-static const float TEMPERATURE_DIFFERENCE = 0.4;
+static const float TEMPERATURE_DIFFERENCE = 0.25;
 static float g_prevTempReading;
 
 static int g_prevButtonReading = false;
@@ -315,7 +315,7 @@ void createTemperature()
     port.type = IN;
 
     // Temperature resource
-    g_temperatureResource = createResource1("/arduino/temperatureSensor/hosting", OIC_DEVICE_SENSOR, OC_RSRVD_INTERFACE_DEFAULT,
+    g_temperatureResource = createResource1("/arduino/temperatureSensor", OIC_DEVICE_SENSOR, OC_RSRVD_INTERFACE_DEFAULT,
                                                       (OC_DISCOVERABLE | OC_OBSERVABLE), temperatureIOHandler, &port);
     analogReference(AR_DEFAULT);
     if(g_temperatureResource != NULL)
@@ -456,24 +456,10 @@ void setup()
     OIC_LOG(DEBUG, TAG, "Creating resource");
 
     createTemperature();
-    createButtonResource();
-    createLightResource();
-
-   /* OCResourceHandle handle;
-    OCStackResult res = OCCreateResource(&handle,
-            "oic.d.light",
-            OC_RSRVD_INTERFACE_DEFAULT,
-            "/android/light",
-            NULL,
-            NULL,
-            OC_DISCOVERABLE|OC_OBSERVABLE);
-    OIC_LOG_V(INFO, TAG, "Created Light resource with result: %s", getResult(res));
-    Serial.print("Created resource with OCStackREsult");
-    Serial.println(res);*/
-  /*  createLightResource();
-    createButtonResource();*/
-
-  /*a  if(OCStartPresence(OC_MAX_PRESENCE_TTL_SECONDS - 1) != OC_STACK_OK)
+    //createButtonResource();
+    //createLightResource();
+/*
+    if(OCStartPresence(0) != OC_STACK_OK)
     {
         OIC_LOG(ERROR, TAG, "Unable to start presence server");
     }

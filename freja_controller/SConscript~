@@ -74,7 +74,8 @@ controller_env.AppendUnique(LIBS = [
     'connectivity_abstraction',
     'libcoap',
     'libTGMSDKLibrary',
-    'dl'
+    'dl',
+    'resource_hosting'
     ])
 
 controller_env.PrependUnique(LIBS = 'resource_directory')
@@ -111,7 +112,8 @@ controller_src = [
 	'src/Controller.cpp',
 	'src/ResourceObject.cpp',
 	'src/DiscoveryManager.cpp',
-	'src/ConfigurationCollection.cpp'
+	'src/ConfigurationCollection.cpp',
+	'src/BuildingController.cpp'
 	]
 
 Controller_Static = controller_env.StaticLibrary('controller', controller_src)

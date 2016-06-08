@@ -1,7 +1,8 @@
 #include "ResourceObject.hpp"
 
 #include <iostream>
-#include "Controller.h"
+//#include "Controller.h"
+#include "BuildingController.h"
 
 using namespace OIC;
 using namespace OC;
@@ -11,17 +12,32 @@ ResourceObject::ResourceObject(RCSRemoteResourceObject::Ptr remoteResource)
 {
     this->m_resourceObject = remoteResource;
 
-    // Set the callbacks
-    m_resourceObject->startCaching(std::bind(&ResourceObject::cacheUpdateCallback, this, std::placeholders::_1));
-    m_resourceObject->startMonitoring(std::bind(&ResourceObject::stateChangedCallback, this, std::placeholders::_1));
+    try
+    {
+        if(remoteResource->getUri().compare("/arduino/temperatureSensor") == 0)
+        {
+            std::cout << "Android temperature sensor. No caching activated" << std::endl;
+        }
+        else
+        {
+            // Set the callbacks
+            m_resourceObject->startCaching(std::bind(&ResourceObject::cacheUpdateCallback, this, std::placeholders::_1));
+            m_resourceObject->startMonitoring(std::bind(&ResourceObject::stateChangedCallback, this, std::placeholders::_1));
+        }
+    }
+    catch(RCSException e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+
     //m_resourceObject->getRemoteAttributes(std::bind(&ResourceObject::remoteAttributesGetCallback, this, std::placeholders::_1));
 
     // Find device type
     setResourceDeviceType(std::move(remoteResource->getTypes()), m_resourceDeviceType);
 
     // Set the controller
-    m_resourceObjectCacheCallback = Controller::getInstance()->getControllerResourceCacheObjCallback();
-    m_resourceObjectStateCallback = Controller::getInstance()->getControllerResourceStateObjCallback();
+    m_resourceObjectCacheCallback = BuildingController::getInstance()->getControllerResourceCacheObjCallback();
+    m_resourceObjectStateCallback = BuildingController::getInstance()->getControllerResourceStateObjCallback();
 }
 
 /**
@@ -94,14 +110,14 @@ std::string ResourceObject::convertResourceDeviceTypeToString(const ResourceDevi
  */
 void ResourceObject::startCaching()
 {
-    if(!m_resourceObject->isCaching() && m_resourceObject->isObservable())
-    {
+    /*if(!m_resourceObject->isCaching() && m_resourceObject->isObservable())
+    {*/
         m_resourceObject->startCaching(std::bind(&ResourceObject::cacheUpdateCallback, this, std::placeholders::_1));
-    }
+    /*}
     else
     {
         std::cerr << "Resource was not caching!" << std::endl;
-    }
+    }*/
 }
 
 /**
@@ -109,14 +125,14 @@ void ResourceObject::startCaching()
  */
 void ResourceObject::stopCaching()
 {
-    if(m_resourceObject->isCaching())
-    {
+    /*if(m_resourceObject->isCaching())
+    {*/
         m_resourceObject->stopCaching();
-    }
+    /*}
     else
     {
         std::cerr << "Resource was not caching!" << std::endl;
-    }
+    }*/
 }
 
 
@@ -126,7 +142,7 @@ void ResourceObject::stopCaching()
  */
 void ResourceObject::setAttributes(RCSResourceAttributes attrs)
 {
-    std::cout << __func__ << std::endl;
+    //std::cout << __func__ << std::endl;
     m_resourceObject->setRemoteAttributes(attrs, std::bind(&ResourceObject::remoteAttributesSetCallback, this, std::placeholders::_1));
 }
 
@@ -150,16 +166,16 @@ RCSRemoteResourceObject::Ptr ResourceObject::getRemoteResourceObject()
 void ResourceObject::cacheUpdateCallback(const RCSResourceAttributes attrs)
 {
     std::lock_guard<mutex> lock(mutex);
-    std::cout << __func__ << std::endl;
+    //std::cout << __func__ << std::endl;
 
     m_attrs = attrs;
 
     // Send the respond to the Controller
     if(m_resourceObjectCacheCallback)
     {
-        std::cout << "\n=================================" << std::endl;
-        std::cout << "Cached changed for device: " << ResourceObject::convertResourceDeviceTypeToString(m_resourceDeviceType) << std::endl;
-        this->printAttributes(attrs);
+      /*  std::cout << "\n=================================" << std::endl;
+        std::cout << "Cached changed for device: " << ResourceObject::convertResourceDeviceTypeToString(m_resourceDeviceType) << std::endl;*/
+        //this->printAttributes(attrs);
         if(m_resourceObjectCacheCallback) {
             m_resourceObjectCacheCallback(std::move(attrs), ResourceObjectState::CACHE_CHANGED, m_resourceDeviceType);
         }
@@ -178,16 +194,16 @@ void ResourceObject::cacheUpdateCallback(const RCSResourceAttributes attrs)
 void ResourceObject::stateChangedCallback(const ResourceState state)
 {
     std::lock_guard<mutex> lock(mutex);
-    std::cout << __func__ << std::endl;
+   // std::cout << __func__ << std::endl;
 
     // Send the response to the Controller
     if(m_resourceObjectStateCallback != nullptr)
     {
-    	std::cout << "\n=================================" << std::endl;
-    	std::cout << "State changed for device: " << ResourceObject::convertResourceDeviceTypeToString(m_resourceDeviceType) << std::endl;
-    	this->printResourceState(state);
+        //std::cout << "\n=================================" << std::endl;
+        //std::cout << "State changed for device: " << ResourceObject::convertResourceDeviceTypeToString(m_resourceDeviceType) << std::endl;
+        //this->printResourceState(state);
         if(m_resourceObject) {
-            std::cout << "Before resourceobject call" << std::endl;
+            //std::cout << "Before resourceobject call" << std::endl;
             m_resourceObjectStateCallback(state, m_resourceObject->getUri(), m_resourceObject->getAddress());
         }
         else
