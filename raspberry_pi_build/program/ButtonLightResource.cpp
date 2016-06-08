@@ -46,6 +46,8 @@ int main()
 {
     std::cout << "Starting Light and Button Resources program" << std::endl;
 
+    wiringPiSetup();
+
     g_lightResource = LightResource(GPIO_RPI_PIN_8, "/rpi/light");
     g_lightResource.createResource();
 

@@ -5,7 +5,7 @@ ButtonResource::ButtonResource()
 {
     // Not initialized
 #ifdef ARM
-    wiringPiSetup();
+//    wiringPiSetup();
     m_inputPortPin = -1;
 #endif
 }
@@ -24,7 +24,7 @@ ButtonResource::ButtonResource(int portPin, const std::string &uri)
 
     // Initialize pins
 #ifdef ARM
-    wiringPiSetup();
+ //   wiringPiSetup();
     pinMode(portPin, OUTPUT);
 #endif
 }

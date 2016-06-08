@@ -6,7 +6,7 @@ LightResource::LightResource() :
 {
     // Not initialized
 #ifdef ARM
-    wiringPiSetup();
+//    wiringPiSetup();
     m_outputPortPin = -1;
 #endif
 }
@@ -26,7 +26,7 @@ LightResource::LightResource(int portPin, const std::string &uri) :
 
     // Initialize pins
 #ifdef ARM
-    wiringPiSetup();
+  //  wiringPiSetup();
     pinMode(portPin, OUTPUT);
     std::cout << "TARGET IS ARM" << std::endl;
 #endif
