@@ -251,10 +251,13 @@ void temperatureIOHandler(OCRepPayloadValue *attribute, OCIOPort *port, OCResour
 
         if(attribute->d >= g_prevTempReading + TEMPERATURE_DIFFERENCE || attribute->d <= g_prevTempReading - TEMPERATURE_DIFFERENCE)
         {
-            Serial.print("Temperature is: ");
-            Serial.println(attribute->d);
-            OIC_LOG(DEBUG, TAG, "Notifying temperature");
-            OCNotifyAllObservers(handle, OC_MEDIUM_QOS);
+            if(*underObservation)
+            {
+                Serial.print("Temperature is: ");
+                Serial.println(attribute->d);
+                OIC_LOG(DEBUG, TAG, "Notifying temperature");
+                OCNotifyAllObservers(handle, OC_MEDIUM_QOS);
+            }
 
             g_prevTempReading = attribute->d;
         }
@@ -453,13 +456,28 @@ void setup()
     OIC_LOG(DEBUG, TAG, "Creating resource");
 
     createTemperature();
-    createLightResource();
     createButtonResource();
+    createLightResource();
 
-    if(OCStartPresence(OC_MAX_PRESENCE_TTL_SECONDS - 1) != OC_STACK_OK)
+   /* OCResourceHandle handle;
+    OCStackResult res = OCCreateResource(&handle,
+            "oic.d.light",
+            OC_RSRVD_INTERFACE_DEFAULT,
+            "/android/light",
+            NULL,
+            NULL,
+            OC_DISCOVERABLE|OC_OBSERVABLE);
+    OIC_LOG_V(INFO, TAG, "Created Light resource with result: %s", getResult(res));
+    Serial.print("Created resource with OCStackREsult");
+    Serial.println(res);*/
+  /*  createLightResource();
+    createButtonResource();*/
+
+  /*a  if(OCStartPresence(OC_MAX_PRESENCE_TTL_SECONDS - 1) != OC_STACK_OK)
     {
         OIC_LOG(ERROR, TAG, "Unable to start presence server");
     }
+*/
 
 
     OIC_LOG(DEBUG, TAG, "Finished setup");
