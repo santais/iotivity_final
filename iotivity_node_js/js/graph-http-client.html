@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+        var chartData = null;
+        var chart = null;
+        var options = null;
+        var socket = io();
+
+        var existingResources = [];
+        
+        socket.on("connect", function() {
+          console.log("Connected!");
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+        socket.on('change_header', function(data) {
+           document.getElementById('active_state').innerHTML = data.header;
+
+           activeHeader = document.getElementById('active_state');
+
+           if(data.header == 'Active')
+           {
+              activeHeader.style.color = "#33cc33";
+           }
+           else if(data.header == "Inactive")
+           {
+              activeHeader.style.color = "#FF0000"
+           }
+
+        });
+        socket.on('sensor_readings', function(data) {
+          test = [
+          ['Time', 'Temperature']];
+
+          var arrayLength = data.values.length;
+          for (var i = 0; i < arrayLength; i++) {
+            test.push([data.values[i][0], data.values[i][1]]);
+          }
+
+          chartData = google.visualization.arrayToDataTable(
+           test
+          );
+
+          chart.draw(chartData, options);
+
+
+      });
+
+        socket.on("found_resource", function(data) {
+            if(data.resource) {
+             // console.log(data.resource.uri);
+            }
+            else if(data.response) {
+              attribute = data.response.payload.values;
+              uri = data.response.resourceUri;
+              value = null;
+
+
+             // console.log(attribute);
+
+              attributeString = null;
+
+              if("power" in attribute) 
+              {
+                attributeString = "power";
+                value = attribute.power;
+                //console.log("Power found");
+              }
+              else if("state" in attribute)
+              {
+                attributeString = "state";
+                value = attribute.state;
+               // console.log("State found");
+              }
+
+              src = document.getElementById('picture');
+
+              if(!src) {
+                console.log("src is null");
+              }
+
+              resourceExists = false;
+              for(var i = 0; i < existingResources.length; i++) {
+                 if(JSON.stringify(existingResources[i].uri) == JSON.stringify(uri) &&
+                  JSON.stringify(existingResources[i].addr == JSON.stringify(data.response.addr))) {
+                    resourceExists = true;
+                    console.log("Resource with uri " + uri + " already exists");
+                 }
+              }
+
+              if(!resourceExists) {
+
+                existingResources.push({
+                  "uri": uri,
+                  "addr": data.response.addr
+                });
+
+                // Insert Uri
+                header  = document.createElement("H1");
+                textNode = document.createTextNode('\t' + data.response.resourceUri + '\t' + attributeString + '\t' + value);
+                header.setAttribute("id", uri);
+                header.appendChild(textNode)
+                src.appendChild(header);
+/*
+                br = document.createElement("br");  
+                src.appendChild(br);*/
+              }
+
+            }
+            
+        });
+
+        socket.on("observe_request", function(data) {
+          console.log("Inside observe request");
+
+          src = document.getElementById('picture');
+
+          attribute = data.response.payload.values;
+          uri = data.response.resourceUri;
+          value = null;
+
+          if("power" in attribute) 
+          {
+            attributeString = "power";
+            value = attribute.power;
+           // console.log("Power found");
+          }
+          else if("state" in attribute)
+          {
+            attributeString = "state";
+            value = attribute.state;
+          //  console.log("State found");
+          }
+
+
+          children = src.childNodes;
+         // console.log("Children length: " + children.length);
+          //console.log("childe nodes: " + src.childNodes.length);
+          for(var i = 0; i < children.length; i++) {
+            console.log(children[i].id);
+            if(children[i].id == uri) {
+              children[i].innerHTML = '\t' + data.response.resourceUri + '\t' + attributeString + '\t' + value;
+            }
+            /*textNode = document.createTextNode("New node");
+            children[i].replaceChild(textNode, children[i]);*/
+          }
+        });
+    });
+
+       // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+          charData = google.visualization.arrayToDataTable([
+          ['Time', 'Tempearture'],
+          [ 0,      0],
+          ]);
+
+          options = {
+          title: 'Time vs. Temperature comparison',
+          hAxis: {title: 'Time Seconds', minValue: 0},
+          vAxis: {title: 'Temperature', minValue: 0},
+          legend: 'none'
+          };
+          
+          chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+          chart.draw(charData, options);
+      }
+
+      function onDiscoveryClick() {
+          var discoveryRequest = "discover"
+          socket.emit("discover", discoveryRequest); 
+
+        }
+    </script>
+  </head>
+<body>
+
+  <h2 id="header" align="center">Building Analysis</h2>
+  <h3 id="active_state" align="center" style="color:red">Inactive</h3>
+
+  <!-- Buttons -->
+  <div id="Buttons" align="center">
+  <button type="button" onClick="onDiscoveryClick()">Start Discovery</button>
+
+  <div id="chart_div" style="width:900px; height:500px; display:block; margin: 0 auto;">
+  </div>
+
+  <div id="picture">
+  </div>
+
+</body>
+</html>

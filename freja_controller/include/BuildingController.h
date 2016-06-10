@@ -102,6 +102,20 @@ namespace OIC { namespace Service {
         ResourceObject::ResourceObjectCacheCallback getControllerResourceCacheObjCallback();
         ResourceObject::ResourceObjectStateCallback getControllerResourceStateObjCallback();
 
+
+        /**
+         * @brief setMaxTemperatureThreshold Set min and max threshold
+         * @param threshold
+         */
+        void setMaxTemperatureThreshold(const double &threshold);
+        void setMinTemperatureThreshold(const double &threshold);
+
+        /**
+         * @brief getMaxTemperatureThreshold
+         * @return
+         */
+        double getMaxTemperatureThreshold();
+        double getMinTemperatureThreshold();
     private:
         /**
           * Map containing all discovered resources.
@@ -158,6 +172,12 @@ namespace OIC { namespace Service {
           */
         ResourceObject::ResourceObjectCacheCallback m_resourceObjectCacheCallback;
         ResourceObject::ResourceObjectStateCallback m_resourceObjectStateCallback;
+
+        /**
+          * Min and Max threshold
+          */
+        double m_maxThreshold;
+        double m_minThreshold;
 
     private:
 

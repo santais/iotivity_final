@@ -32,10 +32,25 @@ void handleSigInt(int signum)
     }
 }
 
-int main()
+int main(int argc, char** argv)
 {
     std::cout << "Starting test program" << std::endl;
     controller = BuildingController::Ptr(BuildingController::getInstance());
+
+    // Set max and minimum threshold
+    if(argc > 1)
+    {
+        if(argv[1])
+        {
+            std::cout << "Min temperature is set to: " << argv[1] << std::endl;
+            controller->setMinTemperatureThreshold(static_cast<double>(atof(argv[1])));
+        }
+        if(argv[2])
+        {
+            std::cout << "Max temperature is set to " << argv[2] << std::endl;
+            controller->setMaxTemperatureThreshold(static_cast<double>(atof(argv[2])));
+        }
+    }
     controller->start();
     signal(SIGINT, handleSigInt);
     while (!g_quitFlag)

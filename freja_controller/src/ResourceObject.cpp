@@ -10,34 +10,36 @@ using namespace OIC::Service;
 
 ResourceObject::ResourceObject(RCSRemoteResourceObject::Ptr remoteResource)
 {
-    this->m_resourceObject = remoteResource;
-
-    try
+    if(remoteResource)
     {
+        this->m_resourceObject = remoteResource;
+
+
         if(remoteResource->getUri().compare("/arduino/temperatureSensor") == 0)
         {
             std::cout << "Android temperature sensor. No caching activated" << std::endl;
         }
         else
         {
-            // Set the callbacks
-            m_resourceObject->startCaching(std::bind(&ResourceObject::cacheUpdateCallback, this, std::placeholders::_1));
-            m_resourceObject->startMonitoring(std::bind(&ResourceObject::stateChangedCallback, this, std::placeholders::_1));
+            try
+            {
+                // Set the callbacks
+                m_resourceObject->startCaching(std::bind(&ResourceObject::cacheUpdateCallback, this, std::placeholders::_1));
+                m_resourceObject->startMonitoring(std::bind(&ResourceObject::stateChangedCallback, this, std::placeholders::_1));
+
+            }
+            catch (RCSBadRequestException e)
+            {
+                std::cout << e.what() << std::endl;
+            }
         }
+
+        // Find device type
+        setResourceDeviceType(std::move(remoteResource->getTypes()), m_resourceDeviceType);
+
+        m_resourceObjectCacheCallback = BuildingController::getInstance()->getControllerResourceCacheObjCallback();
+        m_resourceObjectStateCallback = BuildingController::getInstance()->getControllerResourceStateObjCallback();
     }
-    catch(RCSException e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-
-    //m_resourceObject->getRemoteAttributes(std::bind(&ResourceObject::remoteAttributesGetCallback, this, std::placeholders::_1));
-
-    // Find device type
-    setResourceDeviceType(std::move(remoteResource->getTypes()), m_resourceDeviceType);
-
-    // Set the controller
-    m_resourceObjectCacheCallback = BuildingController::getInstance()->getControllerResourceCacheObjCallback();
-    m_resourceObjectStateCallback = BuildingController::getInstance()->getControllerResourceStateObjCallback();
 }
 
 /**
@@ -112,12 +114,18 @@ void ResourceObject::startCaching()
 {
     /*if(!m_resourceObject->isCaching() && m_resourceObject->isObservable())
     {*/
-        m_resourceObject->startCaching(std::bind(&ResourceObject::cacheUpdateCallback, this, std::placeholders::_1));
-    /*}
-    else
+    if(m_resourceObject)
     {
-        std::cerr << "Resource was not caching!" << std::endl;
-    }*/
+        try
+        {
+            m_resourceObject->startCaching(std::bind(&ResourceObject::cacheUpdateCallback, this, std::placeholders::_1));
+        }
+        catch (RCSBadRequestException e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
+
 }
 
 /**
@@ -142,8 +150,17 @@ void ResourceObject::stopCaching()
  */
 void ResourceObject::setAttributes(RCSResourceAttributes attrs)
 {
-    //std::cout << __func__ << std::endl;
-    m_resourceObject->setRemoteAttributes(attrs, std::bind(&ResourceObject::remoteAttributesSetCallback, this, std::placeholders::_1));
+    if(m_resourceObject)
+    {
+        try
+        {
+            m_resourceObject->setRemoteAttributes(attrs, std::bind(&ResourceObject::remoteAttributesSetCallback, this, std::placeholders::_1));
+        }
+        catch(RCSInvalidParameterException e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
 }
 
 /**

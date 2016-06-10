@@ -102,6 +102,35 @@ ResourceObject::ResourceObjectStateCallback BuildingController::getControllerRes
 }
 
 
+/**
+ * @brief setMaxTemperatureThreshold Set min and max threshold
+ * @param threshold
+ */
+void BuildingController::setMaxTemperatureThreshold(const double &threshold)
+{
+    m_maxThreshold = threshold;
+}
+
+void BuildingController::setMinTemperatureThreshold(const double &threshold)
+{
+    m_minThreshold = threshold;
+}
+
+/**
+ * @brief getMaxTemperatureThreshold
+ * @return
+ */
+double BuildingController::getMaxTemperatureThreshold()
+{
+    return m_maxThreshold;
+}
+
+double BuildingController::getMinTemperatureThreshold()
+{
+    return m_minThreshold;
+}
+
+
 
 /**
  * @brief BuildingController
@@ -126,6 +155,10 @@ BuildingController::BuildingController() :
     // Set the system state
     m_systemState = SystemState::IDLE;
     m_lightState = LightState::OFF;
+
+    // Default values for max and minimum temperature thresholds
+    m_maxThreshold = TEMPERATURE_UPPER_THRES;
+    m_minThreshold = TEMPERATURE_LOWER_THRES;
 }
 
 /**
@@ -205,24 +238,31 @@ void BuildingController::checkStateMachine()
  */
 void BuildingController::toggleLights(int onTimeMs, int offTimeMs, SystemState state)
 {
-    while(m_systemState == state)
+    try
     {
-        switch(m_lightState)
+        while(m_systemState == state)
         {
-        case LightState::ON:
-            m_sceneLightsOn->execute(std::bind(&BuildingController::executeSceneCallback, this, std::placeholders::_1));
-            std::this_thread::sleep_for(chrono::milliseconds(onTimeMs));
-            m_lightState = LightState::OFF;
-            break;
+            switch(m_lightState)
+            {
+            case LightState::ON:
+                m_sceneLightsOn->execute(std::bind(&BuildingController::executeSceneCallback, this, std::placeholders::_1));
+                std::this_thread::sleep_for(chrono::milliseconds(onTimeMs));
+                m_lightState = LightState::OFF;
+                break;
 
-        case LightState::OFF:
-            m_sceneLightsOff->execute(std::bind(&BuildingController::executeSceneCallback, this, std::placeholders::_1));
-            std::this_thread::sleep_for(chrono::milliseconds(offTimeMs));
-            m_lightState = LightState::ON;
-            break;
+            case LightState::OFF:
+                m_sceneLightsOff->execute(std::bind(&BuildingController::executeSceneCallback, this, std::placeholders::_1));
+                std::this_thread::sleep_for(chrono::milliseconds(offTimeMs));
+                m_lightState = LightState::ON;
+                break;
+            }
         }
+        std::cout << "Exiting " << __func__ << " thread" << std::endl;
     }
-    std::cout << "Exiting " << __func__ << " thread" << std::endl;
+    catch(RCSInvalidParameterException e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 }
 
 
@@ -238,43 +278,47 @@ void BuildingController::foundResourceCallback(RCSRemoteResourceObject::Ptr reso
 
    try
    {
-       if(resource->getUri().compare(GRAPH_URI) == 0)
+       // Ensure the resource is initialized properbly
+       if(resource)
        {
-           std::cout << "Found graph resource" << std::endl;
-           m_graphResource = resource;
-       }
-       else if(resource->getUri().compare(TEMPERATURE_URI) == 0)
-       {
-           std::cout << "\t Found temperature sensor" << std::endl;
-           m_temperatureResource = resource;
-
-           // Create new thread to run the GET commands
-           std::thread thread(std::bind(&BuildingController::getTemperatureLoop, this));
-           thread.detach();
-       }
-       else if(this->isResourceLegit(resource))
-       {
-           std::unordered_map<std::string, ResourceObject::Ptr>::const_iterator itr = m_resourceList.find (resource->getUri() + resource->getAddress());
-
-           if ( itr == m_resourceList.end() )
+           if(resource->getUri().compare(GRAPH_URI) == 0)
            {
-               // Make new ResourceObject
-               ResourceObject::Ptr resourceObject = ResourceObject::Ptr(new ResourceObject(resource));
+               std::cout << "Found graph resource" << std::endl;
+               m_graphResource = resource;
+           }
+           else if(resource->getUri().compare(TEMPERATURE_URI) == 0)
+           {
+               std::cout << "\t Found temperature sensor" << std::endl;
+               m_temperatureResource = resource;
 
-               m_resourceList.insert({resource->getUri() + resource->getAddress(), resourceObject});
+               // Create new thread to run the GET commands
+               std::thread thread(std::bind(&BuildingController::getTemperatureLoop, this));
+               thread.detach();
+           }
+           else if(this->isResourceLegit(resource))
+           {
+               std::unordered_map<std::string, ResourceObject::Ptr>::const_iterator itr = m_resourceList.find (resource->getUri() + resource->getAddress());
 
-               this->printResourceData(resource);
-               this->addResourceToScene(resource);
+               if ( itr == m_resourceList.end() )
+               {
+                   // Make new ResourceObject
+                   ResourceObject::Ptr resourceObject = ResourceObject::Ptr(new ResourceObject(resource));
 
-               std::cout << "\tAdded device: " << resource->getUri() + resource->getAddress() << std::endl;
-               std::cout << "\tDevice successfully added to the list" << std::endl;
+                   m_resourceList.insert({resource->getUri() + resource->getAddress(), resourceObject});
+
+                   this->printResourceData(resource);
+                   this->addResourceToScene(resource);
+
+                   std::cout << "\tAdded device: " << resource->getUri() + resource->getAddress() << std::endl;
+                   std::cout << "\tDevice successfully added to the list" << std::endl;
+
+               }
+               else
+               {
+                  std::cout << "Resource is already in the list" << std::endl;
+               }
 
            }
-           else
-           {
-              std::cout << "Resource is already in the list" << std::endl;
-           }
-
        }
    }
    catch (RCSException e)
@@ -389,7 +433,9 @@ bool BuildingController::isResourceLegit(RCSRemoteResourceObject::Ptr resource)
         if (uri.compare(
                 uri.size()-HOSTING_TAG_SIZE, HOSTING_TAG_SIZE, HOST_TAG) == 0)
         {
-            std::cout << "Device: " << uri << " is not a legit device. Device is hosting" << std::endl;
+            std::cout << "===================================" << std::endl;
+            std::cout << "\t Device: " << uri << " is not a legit device. Device is hosting" << std::endl;
+            std::cout << "===================================" << std::endl;
             return false;
         }
         return true;
@@ -427,7 +473,7 @@ void BuildingController::addResourceToScene(RCSRemoteResourceObject::Ptr resourc
            // TODO: Add Speaker
         }
     }
-    catch (RCSException e)
+    catch (RCSInvalidParameterException e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -460,43 +506,50 @@ void BuildingController::executeSceneCallback(int eCode)
 void BuildingController::resourceObjectCacheCallback(const RCSResourceAttributes &attrs, const ResourceObjectState &state, const ResourceDeviceType &deviceType)
 {
     // Itterate through the attributes
-    for(auto const &attr : attrs)
+    try
     {
-        const std::string key = attr.key();
-        const RCSResourceAttributes::Value value = attr.value();
-        // If the device is a button, search for the current state
-        if(deviceType == ResourceDeviceType::OIC_BUTTON && key.compare("state") == 0 &&
-                value.toString().compare("true") == 0)
+        for(auto const &attr : attrs)
         {
-            std::cout << "A button was pressed" << std::endl;
-            switch(m_systemState)
+            const std::string key = attr.key();
+            const RCSResourceAttributes::Value value = attr.value();
+            // If the device is a button, search for the current state
+            if(deviceType == ResourceDeviceType::OIC_BUTTON && key.compare("state") == 0 &&
+                    value.toString().compare("true") == 0)
             {
-            case SystemState::IDLE:
-                m_systemState = SystemState::SAVE_TEMPEARTURE;
-                checkStateMachine();
-                break;
+                std::cout << "A button was pressed" << std::endl;
+                switch(m_systemState)
+                {
+                case SystemState::IDLE:
+                    m_systemState = SystemState::SAVE_TEMPEARTURE;
+                    checkStateMachine();
+                    break;
 
-            case SystemState::SAVE_TEMPEARTURE:
-                std::cerr << "System is currently saving the temperature!" << std::endl;
-                break;
+                case SystemState::SAVE_TEMPEARTURE:
+                    std::cerr << "System is currently saving the temperature!" << std::endl;
+                    break;
 
-            case SystemState::ALARM:
-            case SystemState::ALARM_STARTED:
-                std::cout << "Setting state to ALARM_STOPPED" << std::endl;
-                m_systemState = SystemState::ALARM_STOPPED_THREAD;
-                checkStateMachine();
-                break;
+                case SystemState::ALARM:
+                case SystemState::ALARM_STARTED:
+                    std::cout << "Setting state to ALARM_STOPPED" << std::endl;
+                    m_systemState = SystemState::ALARM_STOPPED_THREAD;
+                    checkStateMachine();
+                    break;
 
-            case SystemState::ALARM_STOPPED:
-                // No functionality
-                break;
+                case SystemState::ALARM_STOPPED:
+                    // No functionality
+                    break;
 
-            default:
+                default:
 
-                break;
+                    break;
 
+                }
             }
         }
+    }
+    catch(RCSException e)
+    {
+        std::cout << e.what() << std::endl;
     }
 
     //printAttributes(attrs);
@@ -511,39 +564,47 @@ void BuildingController::resourceObjectCacheCallback(const RCSResourceAttributes
 void BuildingController::resourceObjectStateCallback(const ResourceState &state, const std::string &uri, const std::string &address)
 {
   //  std::cout << "===================================" << std::endl;
+    try
+    {
     switch(state)
     {
-    case ResourceState::ALIVE:
-            //std::cout << "Resource with uri " << uri << " is ALIVE" << std::endl;
-        break;
-    case ResourceState::LOST_SIGNAL:
-    case ResourceState::DESTROYED:
-        {
-            //std::cout << "Lost Signal to " << uri << std::endl;
-
-            // Find the resource and remove it from the list
-           /* ResourceKey resourceKey = uri + address;
-
-            // Find the object
-            std::unordered_map<ResourceKey, ResourceObject::Ptr>::const_iterator object = m_resourceList.find(resourceKey);
-            if( object == m_resourceList.end())
+        case ResourceState::ALIVE:
+                //std::cout << "Resource with uri " << uri << " is ALIVE" << std::endl;
+            break;
+        case ResourceState::LOST_SIGNAL:
+        case ResourceState::DESTROYED:
             {
-                std::cout << "Object not found!" << std::endl;
+                std::cout << "Lost Signal to " << uri << std::endl;
+
+                // Find the resource and remove it from the list
+               /* ResourceKey resourceKey = uri + address;
+
+                // Find the object
+                std::unordered_map<ResourceKey, ResourceObject::Ptr>::const_iterator object = m_resourceList.find(resourceKey);
+                if( object == m_resourceList.end())
+                {
+                    std::cout << "Object not found!" << std::endl;
+                }
+                else
+                {
+                    // Destroy the object
+                    std::cout << "Resetting resource object " << std::endl;
+                    ResourceObject::Ptr resource = m_resourceList.erase(object)->second;
+                    resource.reset();
+                }*/
             }
-            else
-            {
-                // Destroy the object
-                std::cout << "Resetting resource object " << std::endl;
-                ResourceObject::Ptr resource = m_resourceList.erase(object)->second;
-                resource.reset();
-            }*/
-        }
-        break;
+            break;
 
-    default:
-            std::cout << "Unsupported resource state" << std::endl;
-        break;
-   }
+        default:
+                std::cout << "Unsupported resource state" << std::endl;
+            break;
+       }
+    }
+    catch(RCSException e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
   // std::cout << "===================================" << std::endl;
 }
 
@@ -568,7 +629,7 @@ void BuildingController::printAttributes(const RCSResourceAttributes &attrs)
             std::cout << "\t\t Value: " << attribute.value().toString() << std::endl;
         }
     }
-     std::cout << "=================================\n" << std::endl;
+    std::cout << "=================================\n" << std::endl;
 }
 
 
@@ -582,10 +643,17 @@ void BuildingController::getTemperatureLoop()
         // Initiate a GET request
         if(m_temperatureResource != nullptr)
         {
-            m_temperatureResource->getRemoteAttributes(std::bind(&BuildingController::onGetTemperatureReading, this,
+            try
+            {
+                m_temperatureResource->getRemoteAttributes(std::bind(&BuildingController::onGetTemperatureReading, this,
                                                                  std::placeholders::_1, std::placeholders::_2));
-        }
 
+            }
+            catch(RCSInvalidParameterException e)
+            {
+                std::cout << e.what() << std::endl;
+            }
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(TEMPERATURE_THREAD_FREQ_MS));
     }
 }
@@ -606,17 +674,17 @@ void BuildingController::onGetTemperatureReading(const RCSResourceAttributes &at
         if(attrs.at(tempString) != nullptr)
         {
             double temperature = attrs.at(tempString).get<double>();
-            std::cout << "Temperature is: " << temperature << std::endl;
-            if(m_systemState == SystemState::IDLE && temperature > TEMPERATURE_UPPER_THRES)
+            //std::cout << "Temperature is: " << temperature << std::endl;
+            if(m_systemState == SystemState::IDLE && temperature > m_maxThreshold)
             {
-                std::cout << "Temperature has risen above " << TEMPERATURE_UPPER_THRES << " and the alarm is started" << std::endl;
+                std::cout << "Temperature has risen above " << m_maxThreshold << " and the alarm is started" << std::endl;
                 std::cout << "ALARM IS STARTED!!!" << std::endl;
                 m_systemState = SystemState::ALARM;
             }
             else if((m_systemState == SystemState::ALARM_STARTED || m_systemState == SystemState::ALARM_STOPPED) &&
-                    temperature < TEMPERATURE_LOWER_THRES)
+                    temperature < m_minThreshold)
             {
-                std::cout << "Temperature has droppbed below " << TEMPERATURE_LOWER_THRES << " and the alarm is stopped\n";
+                std::cout << "Temperature has droppbed below " << m_minThreshold << " and the alarm is stopped\n";
                 std::cout << "ALARM IS STOPPED!!!" << std::endl;
                 m_systemState = SystemState::IDLE;
             }
@@ -625,6 +693,10 @@ void BuildingController::onGetTemperatureReading(const RCSResourceAttributes &at
         }
     }
     catch(RCSInvalidKeyException e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+    catch(RCSBadGetException e)
     {
         std::cout << e.what() << std::endl;
     }
