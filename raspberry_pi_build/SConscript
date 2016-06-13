@@ -91,7 +91,8 @@ rpi_src = [
 	'src/MaintenanceResource.cpp',
 	'src/LightResource.cpp',
 	'src/ButtonResource.cpp',
-	'src/TVResource.cpp'
+	'src/TVResource.cpp',
+	'src/SpeakerResource.cpp'
 	]
 
 Rpi_Static = rpi_env.StaticLibrary('rpi', rpi_src)

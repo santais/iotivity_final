@@ -101,6 +101,11 @@ void MaintenanceResource::setRebootCallback(RebootCallback cb)
     std::bind(&m_rebootCallback, this, std::move(cb));
 }
 
+void MaintenanceResource::setShutdownCallback(ShutdownCallback cb)
+{
+    std::bind(&m_shutdownCallback, this, std::move(cb));
+}
+
 /**
  * @brief Set the stat collection callback
  *
@@ -118,7 +123,8 @@ void MaintenanceResource::setStatCollectionCallback(StatCollectionCallback cb)
 MaintenanceResource::MaintenanceResource() : m_uri(MAINTENANCE_URI), m_resourceType(MAINTENANCE_RESOURCE_TYPE),
     m_factoryResetCallback(std::bind(&MaintenanceResource::factoryReset, this)),
     m_rebootCallback(std::bind(&MaintenanceResource::rebootDevice, this)),
-    m_statCollectionCallback(std::bind(&MaintenanceResource::statCollection, this))
+    m_statCollectionCallback(std::bind(&MaintenanceResource::statCollection, this)),
+    m_shutdownCallback(std::bind(&MaintenanceResource::shutdown, this))
 {
     m_attributes[MAINTENANCE_FACTORY_RESET]     = false;
     m_attributes[MAINTENANCE_REBOOT]            = false;
@@ -163,6 +169,13 @@ RCSSetResponse MaintenanceResource::setRequestHandler(const RCSRequest &request,
                 this->statCollection();
             }
         }
+        else if(attr.key().compare(MAINTENANCE_SHUTDOWN) == 0)
+        {
+            if(value.compare("true") == 0)
+            {
+                this->shutdown();
+            }
+        }
         else
         {
             std::cout << "Invalid Key request" << std::endl;
@@ -192,6 +205,7 @@ void MaintenanceResource::createResource()
         m_resource->setAttribute(MAINTENANCE_FACTORY_RESET, m_attributes[MAINTENANCE_FACTORY_RESET]);
         m_resource->setAttribute(MAINTENANCE_REBOOT, m_attributes[MAINTENANCE_REBOOT]);
         m_resource->setAttribute(MAINTENANCE_STAT_COLLECTION, m_attributes[MAINTENANCE_STAT_COLLECTION]);
+        m_resource->setAttribute(MAINTENANCE_SHUTDOWN, m_attributes[MAINTENANCE_SHUTDOWN]);
 
         m_resource->setSetRequestHandler(std::bind(&MaintenanceResource::setRequestHandler, this, std::placeholders::_1,
                                                    std::placeholders::_2));
@@ -208,6 +222,7 @@ void MaintenanceResource::factoryReset()
     m_attributes[MAINTENANCE_FACTORY_RESET]     = false;
     m_attributes[MAINTENANCE_REBOOT]            = false;
     m_attributes[MAINTENANCE_STAT_COLLECTION]   = false;
+    m_attributes[MAINTENANCE_SHUTDOWN]          = false;
 }
 
 /**
@@ -230,6 +245,25 @@ void MaintenanceResource::rebootDevice()
     //std::cout << "return: " << res << std::endl;
 #else
     std::cerr << "Unsupported Operating System" << std::endl;
+#endif
+}
+
+/**
+ * @brief MaintenanceResource::shutdown
+ */
+void MaintenanceResource::shutdown()
+{
+#ifdef __linux__
+    int res;
+    std::cout << "Shutdown will be soon..." << std::endl;
+    m_attributes[MAINTENANCE_SHUTDOWN] = false;
+    m_resource->notify();
+
+    // Shutdown linux
+    sync();
+    reboot(RB_POWER_OFF);
+#else
+    std::err << "Unsupported operating system" << std::endl;
 #endif
 }
 

@@ -108,6 +108,7 @@ RpiMain = rpi_env.Program('BootstrapServer', 'bootstrapserver.cpp')
 
 RpiMain = rpi_env.Program('TVResource', 'tvResource.cpp')
 RpiMain = rpi_env.Program('ButtonLightResource', 'ButtonLightResource.cpp')
+RpiMain = rpi_env.Program('SpeakerResource', 'SpeakerResource.cpp')
 
 RpiMain = rpi_env.Program('LightResourceHosting', 'LightResourceHosting.cpp')
 #rpi_constrained = rpi_env.Program('LightResourceConstrained', 'LightResourceConstrained.cpp')

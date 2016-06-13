@@ -105,7 +105,7 @@ int ButtonResource::createResource()
 
     m_resource = std::make_shared<RPIRCSResourceObject>(RPIRCSResourceObject(m_uri,
                             std::move(resource_types), std::move(std::vector<std::string> {OC_RSRVD_INTERFACE_DEFAULT,
-                                                                 OC_RSRVD_INTERFACE_READ})));
+                                                                 OC_RSRVD_INTERFACE_READ, "oic.if.a"})));
 
     m_resource->createResource(true, true, false);
 

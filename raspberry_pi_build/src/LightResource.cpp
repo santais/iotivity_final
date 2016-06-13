@@ -111,7 +111,8 @@ int LightResource::createResource()
     }
 
     m_resource = std::make_shared<RPIRCSResourceObject>(RPIRCSResourceObject(m_uri,
-                            std::move(resourceTypes), std::move(std::vector<std::string> {OC_RSRVD_INTERFACE_DEFAULT})));
+                            std::move(resourceTypes), std::move(std::vector<std::string> {OC_RSRVD_INTERFACE_DEFAULT,
+                                                                "oic.if.rw", "oic.if.a"})));
 
     m_resource->createResource(true, true, false);
 

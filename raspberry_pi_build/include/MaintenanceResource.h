@@ -29,6 +29,7 @@ namespace
     static const std::string MAINTENANCE_FACTORY_RESET      = "fr";
     static const std::string MAINTENANCE_REBOOT             = "rb";
     static const std::string MAINTENANCE_STAT_COLLECTION    = "ssc";
+    static const std::string MAINTENANCE_SHUTDOWN           = "sd";
 }
 
 class MaintenanceResource
@@ -39,6 +40,7 @@ public:
 
     typedef std::function <void () > FactoryResetCallback;
     typedef std::function <void () > RebootCallback;
+    typedef std::function <void () > ShutdownCallback;
     typedef std::function <void () > StatCollectionCallback;
 public:
 
@@ -111,6 +113,13 @@ public:
     void setStatCollectionCallback(StatCollectionCallback cb);
 
     /**
+     * @brief setShutdownCallback
+     *
+     * @param cb
+     */
+    void setShutdownCallback(ShutdownCallback cb);
+
+    /**
      * @brief Creates a /oic/mnt resource instance
      */
     void createResource();
@@ -145,6 +154,13 @@ private:
      * @brief Start statistical collection
      */
     void statCollection();
+
+    /**
+     * @brief shutdown the controller
+     */
+    void shutdown();
+
+
 
 private:
 
@@ -187,6 +203,11 @@ private:
      * @brief Callback for stat collection
      */
     StatCollectionCallback m_statCollectionCallback;
+
+    /**
+     * @brief Callback for shutdown
+     */
+    ShutdownCallback m_shutdownCallback;
 
 };
 
