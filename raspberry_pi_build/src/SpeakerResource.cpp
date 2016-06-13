@@ -171,19 +171,21 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
                 if(!m_audioRunning)
                 {
                     std::thread thread(std::bind(&SpeakerResource::playAudioThread, this));
+                    thread.detach();
                 }
-                thread.detach();
                 m_audioRunning = true;
                 break;
             }
             case ALARM_STOP:
-
+                std::lock_guard<std::mutex> lock(m_audioRunningMutex);
                 // Kill thread
                 m_audioRunning = false;
 
                 // Play stop sound
 #ifdef __linux__
+#ifdef ARM
                     system("aplay /home/rpi/alarm_stop.wav");
+#endif
 #else
                     std::cerr << "Unsupported Operating System" << std::endl;
 #endif
