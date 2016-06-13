@@ -52,15 +52,15 @@ if env.get('LOGGING'):
 ######################################################################
 # Source files and Targets
 ######################################################################
-randomtests = randomtest_env.Program('randomtests', ['linux/randomtest.cpp'])
+#randomtests = randomtest_env.Program('randomtests', ['linux/randomtest.cpp'])
 
-Alias("test", [randomtests])
+#Alias("test", [randomtests])
 
-env.AppendTarget('test')
-if env.get('TEST') == '1':
-	target_os = env.get('TARGET_OS')
-	if target_os == 'linux':
-                from tools.scons.RunTest import *
-                run_test(randomtest_env,
-                         'resource_csdk_random_test.memcheck',
-                         'resource/c_common/ocrandom/test/randomtests')
+#env.AppendTarget('test')
+#if env.get('TEST') == '1':
+#	target_os = env.get('TARGET_OS')
+#	if target_os == 'linux':
+ #               from tools.scons.RunTest import *
+  #              run_test(randomtest_env,
+   #                      'resource_csdk_random_test.memcheck',
+    #                     'resource/c_common/ocrandom/test/randomtests')

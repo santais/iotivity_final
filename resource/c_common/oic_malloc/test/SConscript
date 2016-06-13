@@ -41,15 +41,15 @@ if env.get('LOGGING'):
 ######################################################################
 # Source files and Targets
 ######################################################################
-malloctests = malloctest_env.Program('malloctests', ['linux/oic_malloc_tests.cpp'])
+#malloctests = malloctest_env.Program('malloctests', ['linux/oic_malloc_tests.cpp'])
 
-Alias("test", [malloctests])
+#Alias("test", [malloctests])
 
-env.AppendTarget('test')
-if env.get('TEST') == '1':
-	target_os = env.get('TARGET_OS')
-	if target_os == 'linux':
-                from tools.scons.RunTest import *
-                run_test(malloctest_env,
-                         'resource_ccommon_malloc_test.memcheck',
-                         'resource/c_common/oic_malloc/test/malloctests')
+#env.AppendTarget('test')
+#if env.get('TEST') == '1':#
+#	target_os = env.get('TARGET_OS')
+#	if target_os == 'linux':
+ #               from tools.scons.RunTest import *
+  #              run_test(malloctest_env,
+   #                      'resource_ccommon_malloc_test.memcheck',
+    #                     'resource/c_common/oic_malloc/test/malloctests')
