@@ -168,9 +168,12 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
             case ALARM_ACTIVE:
             {
                 // Start thread
-                m_audioRunning = true;
-                std::thread thread(std::bind(&SpeakerResource::playAudioThread, this));
+                if(!m_audioRunning)
+                {
+                    std::thread thread(std::bind(&SpeakerResource::playAudioThread, this));
+                }
                 thread.detach();
+                m_audioRunning = true;
                 break;
             }
             case ALARM_STOP:

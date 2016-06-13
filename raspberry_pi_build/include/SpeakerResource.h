@@ -12,7 +12,7 @@ namespace
     const int ALARM_ACTIVE = 1;
     const int ALARM_STOP = 2;
 
-    const int AUDIO_THREAD_DELAY_MS = 2000;
+    const int AUDIO_THREAD_DELAY_MS = 6000;
 
     enum class AttributeType
     {
