@@ -39,12 +39,15 @@ const static char* OIC_DEVICE_BUTTON                     = "oic.d.button";
 const static char* OIC_DEVICE_TV                         = "oic.d.tv";
 const static char* OIC_DEVICE_THERMOSTAT                 = "oic.d.theromstat";
 const static char* OIC_DEVICE_FAN                        = "oic.d.fan";
+const static char* OIC_DEVICE_SPEAKER                    = "oic.d.speaker";
 // More toc ome...
 
-const static char* RASPBERRY_PI_DEVICE_CONTROLLER       = "raspberry.pi";
+const static char* RASPBERRY_PI_DEVICE_CONTROLLER        = "raspberry.pi";
 
-// TV Mode demonstration
-const static char* MP_TYPE_TV_MODE                       = "mp.r.tv.mode";
+//
+// Resource Types
+//
+const static char* OIC_TYPE_GRAPH                        = "oic.wk.graph";
 
 //
 // Light Resource Types
