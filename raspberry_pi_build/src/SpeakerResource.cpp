@@ -119,8 +119,8 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
     for(const auto& attr : attrs)
     {
         std::string attrString = attr.value().toString();
-        std::cout << attrString << std::endl;
-        std::cout << attr.key() << std::endl;
+       // std::cout << attrString << std::endl;
+       // std::cout << attr.key() << std::endl;
 
         AttributeType type = getAttributeType(attr.key());
         switch(type)
@@ -177,11 +177,13 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
                 break;
             }
             case ALARM_STOP:
-                std::lock_guard<std::mutex> lock(m_audioRunningMutex);
                 // Kill thread
                 m_audioRunning = false;
 
+                std::lock_guard<std::mutex> lock(m_audioRunningMutex);
+
                 // Play stop sound
+                std::cout << "Play stop sound" << std::endl;
 #ifdef __linux__
 #ifdef ARM
                     system("aplay /home/rpi/alarm_stop.wav");
@@ -270,10 +272,13 @@ void SpeakerResource::playAudioThread()
 
         m_audioRunningMutex.unlock();
 
-        // Sleep thread for 2 seconds
+        if(!m_audioRunning)
+            break;
+
+        // Sleep thread for 6 seconds
         std::this_thread::sleep_for(std::chrono::milliseconds(AUDIO_THREAD_DELAY_MS));
     }
-    std::cout << "Stopping " << __func__ << std::endl;
+    std::cout << "Stopping playAudioThread" << std::endl;
 }
 
 /**
