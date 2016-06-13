@@ -183,7 +183,7 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
 
                 // Play stop sound
 #ifdef __linux__
-                    system("mpg123 /home/rpi/alarm_stop.mp3");
+                    system("aplay /home/rpi/alarm_stop.wav");
 #else
                     std::cerr << "Unsupported Operating System" << std::endl;
 #endif
@@ -261,7 +261,7 @@ void SpeakerResource::playAudioThread()
 
         // Play audio
         #ifdef __linux__
-            system("mpg123 /home/rpi/alarm_sound.mp3");
+            system("aplay /home/rpi/alarm_sound.wav");
         #else
             std::cerr << "Unsupported Operating system" << std::endl;
         #endif
