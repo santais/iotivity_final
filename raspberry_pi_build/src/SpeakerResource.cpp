@@ -159,9 +159,6 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
             break;
         case AttributeType::SOUND:
         {
-            // Acquire mutex
-            std::lock_guard<std::mutex> lock(m_audioRunningMutex);
-
             int type = attr.value().get<int>();
             switch(type)
             {
@@ -180,7 +177,15 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
                 // Kill thread
                 m_audioRunning = false;
 
-                std::lock_guard<std::mutex> lock(m_audioRunningMutex);
+                int count = 0;
+                while(!m_audioRunningMutex.try_lock() && count < 20)
+                {
+                    count++;
+                   // std::cerr << "Failed to lock mutex" << std::endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    if(count >= 10)
+                        break;
+                }
 
                 // Play stop sound
                 std::cout << "Play stop sound" << std::endl;
@@ -258,19 +263,15 @@ void SpeakerResource::setAttributes()
  */
 void SpeakerResource::playAudioThread()
 {
+    std::lock_guard<std::mutex> lock(m_audioRunningMutex);
     while(m_audioRunning)
     {
-        // Acquire mutex
-        m_audioRunningMutex.lock();
-
         // Play audio
         #ifdef __linux__
             system("aplay /home/rpi/alarm_sound.wav");
         #else
             std::cerr << "Unsupported Operating system" << std::endl;
         #endif
-
-        m_audioRunningMutex.unlock();
 
         if(!m_audioRunning)
             break;
