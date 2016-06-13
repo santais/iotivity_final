@@ -25,7 +25,7 @@ ResourceObject::ResourceObject(RCSRemoteResourceObject::Ptr remoteResource)
             {
                 // Set the callbacks
                 m_resourceObject->startCaching(std::bind(&ResourceObject::cacheUpdateCallback, this, std::placeholders::_1));
-                m_resourceObject->startMonitoring(std::bind(&ResourceObject::stateChangedCallback, this, std::placeholders::_1));
+                //m_resourceObject->startMonitoring(std::bind(&ResourceObject::stateChangedCallback, this, std::placeholders::_1));
 
             }
             catch (RCSBadRequestException e)
@@ -48,7 +48,7 @@ ResourceObject::ResourceObject(RCSRemoteResourceObject::Ptr remoteResource)
 ResourceObject::~ResourceObject()
 {
     std::cout << __func__ << "Destructor called" << std::endl;
-    m_resourceObject.reset();
+    //m_resourceObject.reset();
     m_resourceObjectCacheCallback = nullptr;
     m_resourceObjectStateCallback = nullptr;
 }
@@ -214,13 +214,13 @@ void ResourceObject::stateChangedCallback(const ResourceState state)
    // std::cout << __func__ << std::endl;
 
     // Send the response to the Controller
-    if(m_resourceObjectStateCallback != nullptr)
+    if(m_resourceObjectStateCallback)
     {
         //std::cout << "\n=================================" << std::endl;
         //std::cout << "State changed for device: " << ResourceObject::convertResourceDeviceTypeToString(m_resourceDeviceType) << std::endl;
         //this->printResourceState(state);
         if(m_resourceObject) {
-            //std::cout << "Before resourceobject call" << std::endl;
+            std::cout << "Before resourceobject call" << std::endl;
             m_resourceObjectStateCallback(state, m_resourceObject->getUri(), m_resourceObject->getAddress());
         }
         else

@@ -375,6 +375,7 @@ app.post('/',function(req,res){
   * @brief Initiate a connection with the HTTP browser
   *  	   and listen for incoming messages
   */
+
 io.on("connection", function(socket) {  
     socket.on("discover", function (data) {
         // Discovery request received from the server
@@ -389,7 +390,65 @@ io.on("connection", function(socket) {
 
 		iotivity.OCMethod.OC_REST_DISCOVER,
 
-		// Standard path for discovering devices/resources
+		// Standard path for discovering devices/resourcerces
+		iotivity.OC_MULTICAST_DISCOVERY_URI + '?rt=oic.d.sensor',
+
+		// There is no destination
+		null,
+
+		// There is no payload
+		null,
+		iotivity.OCConnectivityType.CT_DEFAULT ,
+		iotivity.OCQualityOfService.OC_HIGH_QOS,
+		onResourceDiscovered,
+
+		// There are no header options
+		null );
+    });
+
+
+    socket.on("discover", function (data) {
+        // Discovery request received from the server
+        console.log(data);
+
+        handleReceptacleTempSensor = {}
+
+		iotivity.OCDoResource(
+
+		// The bindings fill in this object
+		handleReceptacleTempSensor,
+
+		iotivity.OCMethod.OC_REST_DISCOVER,
+
+		// Standard path for discovering devices/resourcerces
+		iotivity.OC_MULTICAST_DISCOVERY_URI + '?rt=oic.d.light',
+
+		// There is no destination
+		null,
+
+		// There is no payload
+		null,
+		iotivity.OCConnectivityType.CT_DEFAULT ,
+		iotivity.OCQualityOfService.OC_HIGH_QOS,
+		onResourceDiscovered,
+
+		// There are no header options
+		null );
+    });
+    socket.on("discover", function (data) {
+        // Discovery request received from the server
+        console.log(data);
+
+        handleReceptacleTempSensor = {}
+
+		iotivity.OCDoResource(
+
+		// The bindings fill in this object
+		handleReceptacleTempSensor,
+
+		iotivity.OCMethod.OC_REST_DISCOVER,
+
+		// Standard path for discovering devices/resourcerces
 		iotivity.OC_MULTICAST_DISCOVERY_URI,
 
 		// There is no destination

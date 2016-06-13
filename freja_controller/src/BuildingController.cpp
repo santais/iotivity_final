@@ -436,7 +436,7 @@ bool BuildingController::isResourceLegit(RCSRemoteResourceObject::Ptr resource)
             std::cout << "===================================" << std::endl;
             std::cout << "\t Device: " << uri << " is not a legit device. Device is hosting" << std::endl;
             std::cout << "===================================" << std::endl;
-            return false;
+            return true;//false;
         }
         return true;
     }

@@ -173,8 +173,9 @@ int main()
     }
     std::cout << "Provision complete" << std::endl;
 
+#ifdef ARM
     wiringPiSetup();
-
+#endif
     g_lightResource = LightResource(GPIO_RPI_PIN_8, "/rpi/light/hosting");
     g_lightResource.setHostingResource();
     g_lightResource.createResource();
