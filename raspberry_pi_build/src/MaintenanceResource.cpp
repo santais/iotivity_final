@@ -129,6 +129,7 @@ MaintenanceResource::MaintenanceResource() : m_uri(MAINTENANCE_URI), m_resourceT
     m_attributes[MAINTENANCE_FACTORY_RESET]     = false;
     m_attributes[MAINTENANCE_REBOOT]            = false;
     m_attributes[MAINTENANCE_STAT_COLLECTION]   = false;
+    m_attributes[MAINTENANCE_SHUTDOWN]		= false;
 }
 
 /**

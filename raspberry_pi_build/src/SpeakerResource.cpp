@@ -167,10 +167,16 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
                 // Start thread
                 if(!m_audioRunning)
                 {
+		    std::cout << "Starting speakerResource thread" << std::endl;
                     std::thread thread(std::bind(&SpeakerResource::playAudioThread, this));
                     thread.detach();
-                }
-                m_audioRunning = true;
+                    //m_audioRunning = true;
+		}
+		else
+		{
+			std::cout << "mAudioRunning is true" << std::endl;
+		}
+                //m_audioRunning = true;
                 break;
             }
             case ALARM_STOP:
@@ -264,6 +270,7 @@ void SpeakerResource::setAttributes()
 void SpeakerResource::playAudioThread()
 {
     std::lock_guard<std::mutex> lock(m_audioRunningMutex);
+    m_audioRunning = true;
     while(m_audioRunning)
     {
         // Play audio
