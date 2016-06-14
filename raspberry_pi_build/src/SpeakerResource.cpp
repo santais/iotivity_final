@@ -167,15 +167,15 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
                 // Start thread
                 if(!m_audioRunning)
                 {
-		    std::cout << "Starting speakerResource thread" << std::endl;
+                    std::cout << "Starting speakerResource thread" << std::endl;
                     std::thread thread(std::bind(&SpeakerResource::playAudioThread, this));
                     thread.detach();
                     //m_audioRunning = true;
-		}
-		else
-		{
-			std::cout << "mAudioRunning is true" << std::endl;
-		}
+                }
+                else
+                {
+                    std::cout << "mAudioRunning is true" << std::endl;
+                }
                 //m_audioRunning = true;
                 break;
             }
@@ -287,6 +287,7 @@ void SpeakerResource::playAudioThread()
         std::this_thread::sleep_for(std::chrono::milliseconds(AUDIO_THREAD_DELAY_MS));
     }
     std::cout << "Stopping playAudioThread" << std::endl;
+   // std::terminate();
 }
 
 /**
