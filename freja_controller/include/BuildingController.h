@@ -46,6 +46,7 @@ namespace OIC { namespace Service {
 
     const static std::string GRAPH_URI = "/oic/graph";
     const static std::string TEMPERATURE_URI = "/arduino/temperatureSensor";
+    const static std::string SPEAKER_URI = "/rpi/speaker";
 
     const static double TEMPERATURE_UPPER_THRES = 30;  // Degrees
     const static double TEMPERATURE_LOWER_THRES = 28.8;  // Degrees
@@ -156,6 +157,8 @@ namespace OIC { namespace Service {
          */
         Scene::Ptr m_sceneLightsOn;
         Scene::Ptr m_sceneLightsOff;
+        Scene::Ptr m_sceneStartSpeaker;
+        Scene::Ptr m_sceneStopSpeaker;
 
         /**
          * @brief m_systemState Current active scene state.

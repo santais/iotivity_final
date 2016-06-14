@@ -32,7 +32,7 @@ OCStackResult BuildingController::start()
 {
     // Start the discoveryManager
     const std::vector<std::string> types{OIC_DEVICE_LIGHT, OIC_DEVICE_BUTTON, OIC_DEVICE_SENSOR,
-                OIC_DEVICE_FAN, OIC_DEVICE_TV, OIC_TYPE_GRAPH};
+                OIC_DEVICE_FAN, OIC_DEVICE_TV, OIC_TYPE_GRAPH, OIC_DEVICE_SPEAKER};
     m_discoveryTask = BuildingController::discoverResource(m_discoveryCallback, types);
 
     // Start the FSM
@@ -152,6 +152,9 @@ BuildingController::BuildingController() :
     m_sceneLightsOn  = m_sceneCollection->addNewScene("Lights On");
     m_sceneLightsOff = m_sceneCollection->addNewScene("Lights Off");
 
+    m_sceneStartSpeaker = m_sceneCollection->addNewScene("Start Speaker");
+    m_sceneStopSpeaker  = m_sceneCollection->addNewScene("Stop Speake");
+
     // Set the system state
     m_systemState = SystemState::IDLE;
     m_lightState = LightState::OFF;
@@ -212,7 +215,7 @@ void BuildingController::checkStateMachine()
 
     case SystemState::ALARM_STARTED:
     {
-        // Do Nothing
+         m_sceneStartSpeaker->execute(std::bind(&BuildingController::executeSceneCallback, this, std::placeholders::_1));
         break;
     }
 
@@ -222,6 +225,8 @@ void BuildingController::checkStateMachine()
         std::thread thread(&BuildingController::toggleLights, this, 1600, 400, SystemState::ALARM_STOPPED);
         thread.detach();
         m_systemState = SystemState::ALARM_STOPPED;
+
+         m_sceneStopSpeaker->execute(std::bind(&BuildingController::executeSceneCallback, this, std::placeholders::_1));
         break;
     }
 
@@ -470,7 +475,11 @@ void BuildingController::addResourceToScene(RCSRemoteResourceObject::Ptr resourc
                 m_sceneLightsOff->addNewSceneAction(resource, "power", false);
 
             }
-           // TODO: Add Speaker
+           else if(type.compare(OIC_DEVICE_SPEAKER) == 0)
+            {
+                m_sceneStartSpeaker->addNewSceneAction(resource, "sound", 1);
+                m_sceneStopSpeaker->addNewSceneAction(resource, "sound", 2);
+            }
         }
     }
     catch (RCSInvalidParameterException e)
