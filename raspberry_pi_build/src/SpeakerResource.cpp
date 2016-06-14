@@ -189,7 +189,7 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
                     count++;
                    // std::cerr << "Failed to lock mutex" << std::endl;
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                    if(count >= 10)
+                    if(count >= 20)
                         break;
                 }
 
@@ -197,11 +197,14 @@ void SpeakerResource::setRequestHandler(const RCSRequest &request, RCSResourceAt
                 std::cout << "Play stop sound" << std::endl;
 #ifdef __linux__
 #ifdef ARM
-                    system("aplay /home/rpi/alarm_stop.wav");
+                system("aplay /home/rpi/alarm_stop.wav");
+#else
+                system("aplay /home/markpovlsen/alarm_stop.wav");
 #endif
 #else
-                    std::cerr << "Unsupported Operating System" << std::endl;
+                std::cerr << "Unsupported Operating System" << std::endl;
 #endif
+                m_audioRunningMutex.unlock();
                 break;
             }
 
@@ -269,16 +272,21 @@ void SpeakerResource::setAttributes()
  */
 void SpeakerResource::playAudioThread()
 {
+    std::cout << "Inside playAudioThread!" << std::endl;
     std::lock_guard<std::mutex> lock(m_audioRunningMutex);
     m_audioRunning = true;
     while(m_audioRunning)
     {
         // Play audio
-        #ifdef __linux__
+#ifdef __linux__
+#ifdef ARM
             system("aplay /home/rpi/alarm_sound.wav");
-        #else
+#else
+            system("aplay /home/markpovlsen/alarm_sound.wav");
+#endif
+#else
             std::cerr << "Unsupported Operating system" << std::endl;
-        #endif
+#endif
 
         if(!m_audioRunning)
             break;
@@ -287,7 +295,6 @@ void SpeakerResource::playAudioThread()
         std::this_thread::sleep_for(std::chrono::milliseconds(AUDIO_THREAD_DELAY_MS));
     }
     std::cout << "Stopping playAudioThread" << std::endl;
-   // std::terminate();
 }
 
 /**
