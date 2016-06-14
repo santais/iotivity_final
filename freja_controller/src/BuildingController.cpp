@@ -169,15 +169,16 @@ BuildingController::BuildingController() :
  */
 void BuildingController::checkStateMachine()
 {
+    std::cout << "Inside " << __func__ << std::endl;
     switch(m_systemState)
     {
     case SystemState::IDLE:
-
+        // Do nothing
         break;
 
     case SystemState::SAVE_TEMPEARTURE:
         // TODO: Save temperature
-        if(m_graphResource != nullptr)
+        if(m_graphResource)
         {
             std::cout << "Saving temperature" << std::endl;
             RCSResourceAttributes attrs;
@@ -226,14 +227,20 @@ void BuildingController::checkStateMachine()
         thread.detach();
         m_systemState = SystemState::ALARM_STOPPED;
 
-         m_sceneStopSpeaker->execute(std::bind(&BuildingController::executeSceneCallback, this, std::placeholders::_1));
+        m_sceneStopSpeaker->execute(std::bind(&BuildingController::executeSceneCallback, this, std::placeholders::_1));
         break;
     }
+
+    case SystemState::ALARM_STOPPED:
+        // Do nothing
+        break;
 
     default:
 
         break;
     }
+
+    std::cout << "Leaving " << __func__ << std::endl;
 }
 
 /**
@@ -695,6 +702,7 @@ void BuildingController::onGetTemperatureReading(const RCSResourceAttributes &at
             {
                 std::cout << "Temperature has droppbed below " << m_minThreshold << " and the alarm is stopped\n";
                 std::cout << "ALARM IS STOPPED!!!" << std::endl;
+                m_sceneStopSpeaker->execute(std::bind(&BuildingController::executeSceneCallback, this, std::placeholders::_1));
                 m_systemState = SystemState::IDLE;
             }
             checkStateMachine();
