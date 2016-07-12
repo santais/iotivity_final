@@ -118,7 +118,7 @@ int PCA9685Setup(const uint8_t i2cAddress, uint16_t freq)
     m_activePCA9685->pinOutputList = NULL;
 
     // Setup the I2C Port
-#ifdef RPI
+#ifdef RPI || ARM
     m_activePCA9685->fileDescriptor = wiringPiI2CSetup(m_activePCA9685->i2cAddress);
     // Read current settings and clear restart bit
     int settings = wiringPiI2CReadReg8(m_activePCA9685->fileDescriptor, MODE1) & MODE1_SETUP_MASK;
@@ -141,7 +141,7 @@ int PCA9685Setup(const uint8_t i2cAddress, uint16_t freq)
 void PCA9685Reset()
 {
     // Restart the PCA9685
-#ifdef RPI
+#ifdef RPI || ARM
     int mode1 = wiringPiI2CReadReg8(m_activePCA9685->fileDescriptor, MODE1) & MODE1_RESTART_MASK;
 
     if(mode1)
@@ -174,7 +174,7 @@ uint16_t PCA9685SetFreq(uint16_t freq)
 
     uint16_t prescale = round(CLOCK_FREQ / (FREQ_RESOLUTION * m_activePCA9685->frequency )) - 1;
 
-#ifdef RPI
+#ifdef RPI || ARM
     // Set the settings byte
     int settings = wiringPiI2CReadReg8(m_activePCA9685->fileDescriptor, MODE1) & MODE1_SETUP_MASK;
     int sleep = settings | MODE1_SLEEP_MASK;        // Set bit 5 SLEEP
@@ -232,7 +232,7 @@ void PCA9685SetPWM(uint8_t LEDPin, uint16_t onTime, uint16_t offTime)
     if(LEDPin < 16)
     {
         uint8_t LEDRegister = LED0_ON_L + (LED_NEXT_MASK * LEDPin);
-#ifdef RPI
+#ifdef RPI || ARM
         // Calculate the on and off time and write to the registers
         uint8_t LEDRegisterVal = onTime & LED_L_MASK;               // LED_ON_L
         wiringPiI2CWriteReg8(m_activePCA9685->fileDescriptor, LEDRegister, LEDRegisterVal);
@@ -270,7 +270,7 @@ uint16_t PCA9685GetPWM(uint8_t LEDPin)
     if(LEDPin < 16)
     {
         uint8_t LEDRegister = LED0_ON_L + (LED_NEXT_MASK * LEDPin);
-#ifdef RPI
+#ifdef RPI || ARM
         // First retriev LED_ON_H
         uint8_t registerValue = wiringPiI2CReadReg8(m_activePCA9685->fileDescriptor, LEDRegister + 1);
         pwmValue = registerValue & 0xF;         // Only get the 3. byte
@@ -298,7 +298,7 @@ void PCA9685LEDOn(uint8_t LEDPin)
     if(LEDPin < 16)
     {
         uint8_t LEDRegister = LED0_ON_L + (LED_NEXT_MASK * LEDPin);
-#ifdef RPI
+#ifdef RPI || ARM
         // Read current settings from LED_ON_H
         int settings = wiringPiI2CReadReg8(m_activePCA9685->fileDescriptor, LEDRegister + 1);
         settings |= LED_FULL_ON_OFF_MASK;       // Set full ON mask
@@ -331,7 +331,7 @@ void PCA9685LEDOff(uint8_t LEDPin)
     if(LEDPin < 16)
     {
         uint8_t LEDRegister = LED0_ON_L + (LED_NEXT_MASK * LEDPin);
-#ifdef PRPI
+#ifdef PRPI || ARM
         // Read current settings from LED_OFF_H
         int settings = wiringPiI2CReadReg8(m_activePCA9685->fileDescriptor, LEDRegister + 3);
         settings |= LED_FULL_ON_OFF_MASK;
@@ -354,7 +354,7 @@ void PCA9685LEDOff(uint8_t LEDPin)
  */
 void PCA9685AllLEDsOn()
 {
-#ifdef RPI
+#ifdef RPI || ARM
     // Read current settings
     int settings = wiringPiI2CReadReg8(m_activePCA9685->fileDescriptor, ALL_LED_ON_H);
     settings |= LED_FULL_ON_OFF_MASK;
@@ -377,7 +377,7 @@ void PCA9685AllLEDsOn()
  */
 void PCA9685AllLEDsOff()
 {
-#ifdef RPI
+#ifdef RPI || ARM
     // Read current settings
     int settings = wiringPiI2CReadReg8(m_activePCA9685->fileDescriptor, ALL_LED_OFF_H);
     settings |= LED_FULL_ON_OFF_MASK;
