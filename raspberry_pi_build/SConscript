@@ -92,7 +92,9 @@ rpi_src = [
 	'src/LightResource.cpp',
 	'src/ButtonResource.cpp',
 	'src/TVResource.cpp',
-	'src/SpeakerResource.cpp'
+	'src/SpeakerResource.cpp',
+	'src/PCA9685RPi.c',
+	'src/PCA9685LEDResource.cpp'
 	]
 
 Rpi_Static = rpi_env.StaticLibrary('rpi', rpi_src)

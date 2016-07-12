@@ -74,13 +74,13 @@ void RPIRCSResourceObject::createResource(bool discoverable, bool observable, bo
         std::for_each(m_resourceTypes.begin() + 1, m_resourceTypes.end(),
                       [&builder](const std::string& typeName) {
             builder = builder.addType(typeName);
-            std::cout << "Adding type: " << typeName << std::endl;
+            //std::cout << "Adding type: " << typeName << std::endl;
         });
 
         std::for_each(m_resourceInterfaces.begin() + 1, m_resourceInterfaces.end(),
                       [&builder](const std::string& interfaceName) {
             builder = builder.addInterface(interfaceName);
-            std::cout << "Adding interface: " << std::endl;
+            //std::cout << "Adding interface: " << interfaceName << std::endl;
         });
 
         m_resource = builder.build();
