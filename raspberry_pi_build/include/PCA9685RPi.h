@@ -14,13 +14,14 @@
     extern "C" {
 #endif
 
+
 //#include <iostream>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef RPI || ARM
+#ifdef RPI
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 #endif
@@ -201,10 +202,9 @@ void PCA9685AllLEDsOff();
  * @return
  */
 PCA9685* getActivePCA9685Struct();
-
+  
 #ifdef __cplusplus
 }
 #endif
 
- 
 #endif /* _PCA9685RPI_H_ */

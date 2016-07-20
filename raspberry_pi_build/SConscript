@@ -56,6 +56,7 @@ if env.get('TARGET_ARCH') == 'arm':
 		])
 else:
 	rpi_env.AppendUnique(LIBS = [
+		'libPCA9685RPi',
 		'rcs_client',
 		'rcs_server',
 		'rcs_common',
@@ -85,16 +86,24 @@ rpi_env.AppendUnique(LIBS = ['pthread'])
 # Source files and Targets
 ####################################################################
 rpi_src = [
+	# Drivers
+	'src/PCA9685RPi.c',
+	'src/segment7_controller.c',
+	'src/sn74hc165.c',
+	'src/sn74hc595.c',
+
 	'src/RPIRCSResourceObject.cpp',
-	'src/RPIRCSController.cpp',
+	#'src/RPIRCSController.cpp',
 	'src/ConfigurationResource.cpp',
 	'src/MaintenanceResource.cpp',
-	'src/LightResource.cpp',
-	'src/ButtonResource.cpp',
-	'src/TVResource.cpp',
-	'src/SpeakerResource.cpp',
-	'src/PCA9685RPi.c',
-	'src/PCA9685LEDResource.cpp'
+	#'src/LightResource.cpp',
+	#'src/ButtonResource.cpp',
+	#'src/TVResource.cpp',
+	#'src/SpeakerResource.cpp',
+	#'src/PCA9685RPi.c',
+	'src/PCA9685LEDResource.cpp',
+	'src/RPIBeerPongController.cpp',
+	'src/RPI7SegmentResource.cpp'
 	]
 
 Rpi_Static = rpi_env.StaticLibrary('rpi', rpi_src)

@@ -97,7 +97,7 @@ public:
      * @param name
      * @param value
      */
-    void setAttribute(std::string& name, RCSResourceAttributes::Value value);
+    void setAttribute(const std::string& name, RCSResourceAttributes::Value value);
 
     /**
      * @brief setAttributes

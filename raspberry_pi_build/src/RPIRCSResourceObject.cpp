@@ -186,7 +186,7 @@ RCSResourceAttributes RPIRCSResourceObject::getAttributes()
  * @param name
  * @param value
  */
-void RPIRCSResourceObject::setAttribute(std::string& name, RCSResourceAttributes::Value value)
+void RPIRCSResourceObject::setAttribute(const std::string& name, RCSResourceAttributes::Value value)
 {
     m_resource->setAttribute(name, value);
 }

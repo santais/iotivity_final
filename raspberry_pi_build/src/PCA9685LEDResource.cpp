@@ -184,8 +184,17 @@ void PCA9685LEDResource::setAttributes()
  */
 void PCA9685LEDResource::setPCA9685Outputs()
 {
+    std::cout << __func__ << std::endl;
+
     // Check if the current I2C address is active
     PCA9685* activePCA9685 = getActivePCA9685Struct();
+
+    if(activePCA9685 == NULL)
+    {
+        std::cerr << "PCA9685 not yet initialized" << std::endl;
+        return;
+    }
+
     if(!(activePCA9685->i2cAddress == static_cast<uint8_t>(m_I2CAddress)))
     {
         std::cout << "Setting the I2C Address of the PCA9685 module" << std::endl;

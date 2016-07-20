@@ -19,7 +19,7 @@ RPIBeerPongController::RPIBeerPongController()
     // Initialize the 7 segment resources
     this->initializeSegmentResources();
 
-    //
+    // Setup the Segment7 Controller callback
     Callback<void(Segment7* )>::func = std::bind(&RPIBeerPongController::segmentCallback, this, std::placeholders::_1);
     SegmentValueCallback func = static_cast<SegmentValueCallback>(Callback<void(Segment7*)>::callback);
 
