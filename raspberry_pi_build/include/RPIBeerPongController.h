@@ -101,7 +101,7 @@ private:
      *
      * @param segment   The segment which has changed its value
      */
-    void segmentCallback(Segment7* segment);
+    void segmentCallback(Segment7* segment, uint16_t* inputData);
 
     //static void staticCallback(Segment7* segment);
 

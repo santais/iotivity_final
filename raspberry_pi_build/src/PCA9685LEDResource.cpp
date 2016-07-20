@@ -176,6 +176,8 @@ void PCA9685LEDResource::setAttributes()
     const std::vector<int> LEDValues = {m_redLED.value, m_blueLED.value, m_greenLED.value};
     RCSResourceAttributes::Value value(LEDValues);
     m_resource->addAttribute("rgbValue", value);
+    value = RCSResourceAttributes::Value((bool) false);
+    m_resource->addAttribute("state", value);
 }
 
 

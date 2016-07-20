@@ -19,9 +19,9 @@ RPIBeerPongController::RPIBeerPongController()
     // Initialize the 7 segment resources
     this->initializeSegmentResources();
 
-    //
-    Callback<void(Segment7* )>::func = std::bind(&RPIBeerPongController::segmentCallback, this, std::placeholders::_1);
-    SegmentValueCallback func = static_cast<SegmentValueCallback>(Callback<void(Segment7*)>::callback);
+    // Setup the Segment7 Controller callback
+    Callback<void(Segment7*, uint16_t*)>::func = std::bind(&RPIBeerPongController::segmentCallback, this, std::placeholders::_1, std::placeholders::_2);
+    SegmentValueCallback func = static_cast<SegmentValueCallback>(Callback<void(Segment7*, uint16_t*)>::callback);
 
     if(segment7Setup(NUM_OF_SEGMENT_PAIRS, func) < 0)
     {
@@ -155,12 +155,10 @@ void RPIBeerPongController::initializeSegmentResources()
  *
  * @param segment   The segment which has changed its value
  */
-void RPIBeerPongController::segmentCallback(Segment7* segment)
+void RPIBeerPongController::segmentCallback(Segment7* segment, uint16_t* inputData)
 {
     int id = static_cast<int>(segment->id);
     int value = static_cast<int>(segment->value);
-
-    std::cout << __func__ << std::endl;
 
     if(segment == NULL)
     {
@@ -185,10 +183,42 @@ void RPIBeerPongController::segmentCallback(Segment7* segment)
         return;
     }
 
-    std::cout << "Setting value of resource: " << resource->getUri() << " with id: " <<
-                 resource->getSegmentID() << " to value of: " << value << std::endl;
+   // std::cout << "Setting value of resource: " << resource->getUri() << " with id: " <<
+    //             resource->getSegmentID() << " to value of: " << value << std::endl;
 
     resource->setSegmentValue(value);
+
+    // Check if the state has changed for the particular LED
+    for(int i = 0; i < NUM_OF_SIDE_RESOURCES - 1; i++)
+    {
+        int state = static_cast<int>(*inputData & (1 << i));
+
+        if(segment->id == 0)
+        {
+            bool attribute = m_blueSideResources[i]->getResourceObject()->getResourceObject()->getAttribute<bool>("state");
+            RCSResourceAttributes::Value value((bool) attribute);
+            if(state != attribute)
+            {
+                //std::cout << "Changed occured at pin: " << i << std::endl;
+                RCSResourceObject::Ptr resource = m_blueSideResources[i]->getResourceObject()->getResourceObject();
+                resource->setAttribute("state", (bool)state);
+                resource->notify();
+            }
+        }
+        else if(segment->id == 1)
+        {
+            bool attribute = m_redSideResources[i]->getResourceObject()->getResourceObject()->getAttribute<bool>("state");
+            RCSResourceAttributes::Value value((bool) attribute);
+            if(state != attribute)
+            {
+                //std::cout << "Changed occured at pin: " << i << std::endl;
+                RCSResourceObject::Ptr resource = m_redSideResources[i]->getResourceObject()->getResourceObject();
+                resource->setAttribute("state", (bool)state);
+                resource->notify();
+            }
+        }
+
+    }
 
 
 }

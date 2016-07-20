@@ -70,7 +70,7 @@ typedef struct Segment7 {
  * @brief Callback definition called whenever a change in the
  *		  input is read and a new value of 7 segment is calculated
  */
-typedef void (*SegmentValueCallback)(Segment7* segment7);
+typedef void (*SegmentValueCallback)(Segment7* segment7, uint16_t *inputData);
 
 /**
  * @brief Setup tghe 7segment controller
@@ -116,6 +116,9 @@ void stopSegment7();
  * @brief Get the running status of the thread
  */
 uint8_t getRunningStatus();
+
+void acquireMutex();
+void releaseMutex();
 
 void setTestData(uint8_t data[4]);
 

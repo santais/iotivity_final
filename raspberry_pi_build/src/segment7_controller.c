@@ -36,7 +36,7 @@ static uint8_t m_numOfSegmentPairs = 0;
 pthread_mutex_t m_mutex;
 
 // Test Data. DEBUG
-uint8_t m_testData[4] = {};
+uint8_t dataInput[4] = {};
 
 // 7 Segment Display List
 const static uint8_t m_segmentLookupTable[10] = {
@@ -127,6 +127,7 @@ void* inputThread()
 
 	// Used to announce when a change in the value occured
 	static uint8_t newInputVal = 0;
+    static uint8_t prevData[4] = {};
 
 	// Initialize the dataOutput
 	dataOutput = (uint8_t*) malloc(sizeof(uint8_t) * m_numOfSegmentPairs);
@@ -138,8 +139,8 @@ void* inputThread()
 		newInputVal = 0;
 
 		// Read the current value
-		//dataInput =  SN74HC165Read();
-		pthread_mutex_lock(&m_mutex);	// DEBUG
+        dataInput =  SN74HC165Read();
+        //pthread_mutex_lock(&m_mutex);	// DEBUG
 
 		// Count the number of 1 bits and compare
 		// them with the current value.
@@ -147,8 +148,10 @@ void* inputThread()
 		current = m_segment7;
 		while(current != NULL)
 		{
-			bitCount = hammingWeightBitCount(m_testData[current->shiftRegisterID1]) + 
-				hammingWeightBitCount(m_testData[current->shiftRegisterID2] & INPUT_BITS_MASK);
+            bitCount = hammingWeightBitCount(dataInput[current->shiftRegisterID1]) +
+                hammingWeightBitCount(dataInput[current->shiftRegisterID2] & INPUT_BITS_MASK);
+
+            uint16_t inputBits = (dataInput[current->shiftRegisterID2] << 8) | (dataInput[current->shiftRegisterID1] & 0xFF);
 
 			if(bitCount != current->value)
 			{
@@ -156,17 +159,26 @@ void* inputThread()
 
 				// Announce the program which id changed
                 printf("Segment id: %i has changed and size: %i\n", current->id, sizeof(current));
-                m_callback(current);
+                m_callback(current, &inputBits);
 
 				// Announce new value
 				newInputVal = 1;
 			}
+            else if((dataInput[current->shiftRegisterID1] != prevData[current->shiftRegisterID1]) ||
+                    dataInput[current->shiftRegisterID2] != prevData[current->shiftRegisterID2])
+            {
+                m_callback(current, &inputBits);
+            }
 
 			// Used to segments ID to store the value
 			if(current->id < sizeof(dataOutput)) 
 			{
 				dataOutput[current->id] = current->value;
 			}
+
+            // OVerload previous value
+            prevData[current->shiftRegisterID1] = dataInput[current->shiftRegisterID1];
+            prevData[current->shiftRegisterID2] = dataInput[current->shiftRegisterID2];
 
 			current = current->next;
 		}
@@ -178,7 +190,7 @@ void* inputThread()
 			sendDataToSegment(dataOutput, m_numOfSegmentPairs);
 		}
 
-		pthread_mutex_unlock(&m_mutex);	 // DEBUG
+        //pthread_mutex_unlock(&m_mutex);	 // DEBUG
 		usleep(m_freq);
 	}
 
@@ -358,10 +370,19 @@ uint8_t getRunningStatus()
 
 void setTestData(uint8_t data[4])
 {
-	pthread_mutex_lock(&m_mutex);
-	m_testData[0] = data[0];
-	m_testData[1] = data[1];
-	m_testData[2] = data[2];
-	m_testData[3] = data[3];
-	pthread_mutex_unlock(&m_mutex);
+    dataInput[0] = data[0];
+    dataInput[1] = data[1];
+    dataInput[2] = data[2];
+    dataInput[3] = data[3];
+}
+
+
+void acquireMutex()
+{
+    pthread_mutex_lock(&m_mutex);
+}
+
+void releaseMutex()
+{
+    pthread_mutex_unlock(&m_mutex);
 }

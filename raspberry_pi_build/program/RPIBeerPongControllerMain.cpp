@@ -11,6 +11,8 @@ using namespace Service;
 
 RPIBeerPongController::Ptr controller;
 
+#define FREQUENCY_MILLISECONDS 500000 // 500 MS
+
 /*
 * This is a signal handling function for SIGINT(CTRL+C).
 * A Resource Coordinator handle the SIGINT signal for safe exit.
@@ -43,10 +45,11 @@ int main()
             return 0;
         }
 
-        uint8_t data[4] = {};
+  /*      uint8_t data[4] = {};
         int len, val;
 
         printf("Input 4 new data values. \n");
+        acquireMutex();
 
         for(size_t i = 0; i < 4; i++)
         {
@@ -68,8 +71,9 @@ int main()
 
 
         setTestData(data);
-
-        sleep(1);
+        releaseMutex();
+*/
+        usleep(FREQUENCY_MILLISECONDS);
     }
 
 	return 0;
