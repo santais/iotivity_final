@@ -45,7 +45,7 @@ int main()
             return 0;
         }
 
-  /*      uint8_t data[4] = {};
+        uint8_t data[4] = {};
         int len, val;
 
         printf("Input 4 new data values. \n");
@@ -72,7 +72,7 @@ int main()
 
         setTestData(data);
         releaseMutex();
-*/
+
         usleep(FREQUENCY_MILLISECONDS);
     }
 

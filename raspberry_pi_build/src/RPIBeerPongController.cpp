@@ -1,7 +1,8 @@
 #include "RPIBeerPongController.h"
 
 
-RPIBeerPongController::RPIBeerPongController()
+RPIBeerPongController::RPIBeerPongController() : m_controllerState(ControllerState::AUTOMATIC_GAME_ON),
+    m_sequenceState(SequenceState::BOWLING)
 {
     // Initialize the vectors
     std::for_each(m_redSideResources.begin(), m_redSideResources.end(), [](PCA9685LEDResource::Ptr &resource)
@@ -18,6 +19,9 @@ RPIBeerPongController::RPIBeerPongController()
 
     // Initialize the 7 segment resources
     this->initializeSegmentResources();
+
+    // Initialize the RPIRcsresource
+    this->initializeRPIResource();
 
     // Setup the Segment7 Controller callback
     Callback<void(Segment7*, uint16_t*)>::func = std::bind(&RPIBeerPongController::segmentCallback, this, std::placeholders::_1, std::placeholders::_2);
@@ -46,6 +50,16 @@ RPIBeerPongController* RPIBeerPongController::getInstance()
 RPIBeerPongController::~RPIBeerPongController()
 {
     ;
+}
+
+/**
+ * @brief Get the current control state
+ *
+ * @return
+ */
+ControllerState RPIBeerPongController::getControllerState()
+{
+    return m_controllerState;
 }
 
 
@@ -93,7 +107,7 @@ void RPIBeerPongController::initializeCupResources()
     }
 
     // Water Resource
-    waterStringStream << "/pcablue/led/" << NUM_OF_SIDE_RESOURCES;
+    waterStringStream << "/pcablue/led/" << NUM_OF_SIDE_RESOURCES - 1;
     PCA9685LEDResource::Ptr resource = std::make_shared<PCA9685LEDResource>(waterStringStream.str(), I2CADDRESS_BLUE_3, I2C_FREQUENCY_HZ);
     resource->createResource(waterCupPins++, waterCupPins++, waterCupPins++);
     m_blueSideResources[NUM_OF_SIDE_RESOURCES - 1] = resource;
@@ -127,7 +141,7 @@ void RPIBeerPongController::initializeCupResources()
     // Water Resource
     waterStringStream.str(std::string());
     waterStringStream.clear();
-    waterStringStream << "/pcared/led/" << NUM_OF_SIDE_RESOURCES;
+    waterStringStream << "/pcared/led/" << NUM_OF_SIDE_RESOURCES - 1;
     resource = std::make_shared<PCA9685LEDResource>(waterStringStream.str(), I2CADDRESS_BLUE_3, I2C_FREQUENCY_HZ);
     resource->createResource(waterCupPins++, waterCupPins++, waterCupPins++);
     m_redSideResources[NUM_OF_SIDE_RESOURCES - 1] = resource;
@@ -147,6 +161,27 @@ void RPIBeerPongController::initializeSegmentResources()
         resource->createResource();
         m_7SegmentResources[i] = resource;
     }
+}
+
+/**
+ * @brief Initialize the RPIResource object
+ */
+void RPIBeerPongController::initializeRPIResource()
+{
+    // Using default parameters
+    const std::string resourceType = CONTROLLER_TYPE;
+
+    m_resource = std::make_shared<RPIRCSResourceObject>(RPIRCSResourceObject(CONTROLLER_URI,
+                            std::vector<std::string>{resourceType, "oic.d.light"}, std::move(std::vector<std::string> {OC_RSRVD_INTERFACE_DEFAULT,
+                                                                "oic.if.rw", "oic.if.a"})));
+
+    m_resource->createResource(true, true, false);
+
+    m_resource->setReqHandler(std::bind(&RPIBeerPongController::setRequestHandler, this, std::placeholders::_1,
+                                        std::placeholders::_2));
+
+    // Set the attributes
+    this->setAttributes();
 }
 
 /**
@@ -183,55 +218,161 @@ void RPIBeerPongController::segmentCallback(Segment7* segment, uint16_t* inputDa
         return;
     }
 
-   // std::cout << "Setting value of resource: " << resource->getUri() << " with id: " <<
-    //             resource->getSegmentID() << " to value of: " << value << std::endl;
-
     resource->setSegmentValue(value);
 
     // Check if the state has changed for the particular LED
     for(int i = 0; i < NUM_OF_SIDE_RESOURCES - 1; i++)
     {
-        int state = static_cast<int>(*inputData & (1 << i));
+        bool state = static_cast<bool>(*inputData & (1 << i));
+
+        bool attribute = false;
+        RCSResourceObject::Ptr RCSResource = nullptr;
+        PCA9685LEDResource::Ptr PCA9685Resource = nullptr;
 
         if(segment->id == 0)
         {
-            bool attribute = m_blueSideResources[i]->getResourceObject()->getResourceObject()->getAttribute<bool>("state");
-            RCSResourceAttributes::Value value((bool) attribute);
-            if(state != attribute)
-            {
-                //std::cout << "Changed occured at pin: " << i << std::endl;
-                RCSResourceObject::Ptr resource = m_blueSideResources[i]->getResourceObject()->getResourceObject();
-                resource->setAttribute("state", (bool)state);
-                resource->notify();
-            }
+            RCSResource = m_blueSideResources[i]->getResourceObject()->getResourceObject();
+            PCA9685Resource = m_blueSideResources[i];
         }
         else if(segment->id == 1)
         {
-            bool attribute = m_redSideResources[i]->getResourceObject()->getResourceObject()->getAttribute<bool>("state");
-            RCSResourceAttributes::Value value((bool) attribute);
-            if(state != attribute)
-            {
-                //std::cout << "Changed occured at pin: " << i << std::endl;
-                RCSResourceObject::Ptr resource = m_redSideResources[i]->getResourceObject()->getResourceObject();
-                resource->setAttribute("state", (bool)state);
-                resource->notify();
-            }
+            RCSResource = m_redSideResources[i]->getResourceObject()->getResourceObject();
+            PCA9685Resource = m_redSideResources[i];
         }
 
+        if(RCSResource != nullptr && PCA9685Resource != nullptr)
+        {
+            attribute = RCSResource->getAttribute<bool>("state");
+            RCSResourceAttributes::Value RCSValue(attribute);
+
+            if(state != attribute)
+            {
+                std::cout << "Setting cup: " << PCA9685Resource->getUri() << " state to: " << state << std::endl;
+
+                RCSResource->setAttribute("state", state);
+                RCSResource->notify();
+
+                // Set the RGB Values
+                this->setGameLEDLight(PCA9685Resource, state);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief setGameLEDLight
+ */
+void RPIBeerPongController::setGameLEDLight(PCA9685LEDResource::Ptr resource, bool state)
+{
+    if(state)
+    {
+        resource->setRGBValues(CUP_ON_RGB_VALUES);
+    }
+    else
+    {
+        resource->setRGBValues(CUP_OFF_RGB_VALUES);
+    }
+}
+
+
+/**
+ * @brief Handler to receive incoming POST requests
+ *
+ * @param request
+ * @param attr
+ */
+void RPIBeerPongController::setRequestHandler(const RCSRequest &request, RCSResourceAttributes &attrs)
+{
+    std::cout << "Inside " << __func__ << std::endl;
+    ControllerState controllerState = ControllerState::IDLE;
+    SequenceState sequenceState     = SequenceState::IDLE;
+
+    for(const auto &attr : attrs)
+    {
+        if(attr.key().compare(STATE_NAME) == 0)
+        {
+            // Set the new control state
+            std::cout << "Setting STATE" << std::endl;
+            controllerState = static_cast<ControllerState>(attr.value().get<int>());
+
+        }
+        else if(attr.key().compare(SEQUENCE_NAME) == 0)
+        {
+            std::cout << "Setting SEQUENCE" << std::endl;
+            sequenceState = static_cast<SequenceState>(attr.value().get<int>());
+        }
+        else
+        {
+            std::cerr << "Invalid key" << std::endl;
+        }
     }
 
 
+    /*if(controllerState != ControllerState::IDLE && sequenceState != SequenceState::IDLE)
+    {*/
+        std::cout << "Setting state" << std::endl;
+        this->setControlState(controllerState, sequenceState);
+    //}
+
+    std::cout << "Leaving: " << __func__ << std::endl;
 }
 
-/*
-void RPIBeerPongController::staticCallback(Segment7* segment)
+/**
+ * @brief Set the attribute sof the m_resource object
+ */
+void RPIBeerPongController::setAttributes()
 {
-    // Get the object
-    std::cout << __func__ << std::endl;
-    std::cout << "Segment id: " << segment->id << std::endl;
-    RPIBeerPongController* obj = RPIBeerPongController::getInstance();
+    const int controllerState = static_cast<int>(m_controllerState);
+    RCSResourceAttributes::Value RCSValue(controllerState);
+    m_resource->addAttribute(STATE_NAME, RCSValue);
 
-    std::cout << "Calling obj segmentcallback func" << std::endl;
-    obj->segmentCallback(segment);
+    // Add the sequence state
+    const int sequnceState = static_cast<int>(m_sequenceState);
+    RCSValue = RCSResourceAttributes::Value(sequnceState);
+    m_resource->addAttribute(SEQUENCE_NAME, RCSValue);
+
 }
-*/
+
+
+/**
+ * @brief Set the control state
+ *
+ * @param state
+ * @param sequence
+ */
+void RPIBeerPongController::setControlState(ControllerState state, SequenceState sequence)
+{
+    std::cout << __func__ << std::endl;
+    switch(state)
+    {
+    case ControllerState::AUTOMATIC_GAME_ON:
+        // Start the segment 7 driver
+        std::cout << "Setting state to AUTOMATIC" << std::endl;
+        startSegment7();
+        break;
+
+    case ControllerState::MANUAL_LED_CONTROL:
+        // Stop the segment 7 driver
+        std::cout << "Setting state to MANUAL" << std::endl;
+        stopSegment7();
+        break;
+
+    case ControllerState::PLAY_LED_SEQUENCE:
+    {
+        // Stores the previous state which will be active after the sequence is finished
+        ControllerState prevControllerState = m_controllerState;
+        m_controllerState = state;
+        // Run the sequence
+        // TODO: INSERT SEQUENCES
+
+        // Overwrite the state with the current run.
+        state = prevControllerState;
+
+        break;
+    }
+    }
+
+    m_controllerState = state;
+    m_sequenceState = sequence;
+}

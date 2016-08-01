@@ -1,5 +1,5 @@
-#ifndef LIGHTRESOURCE_H_
-#define LIGHTRESOURCE_H_
+#ifndef PCA9685LEDRESOURCE_H_
+#define PCA9685LEDRESOURCE_H_
 
 #include "RPIRCSResourceObject.h"
 #ifdef ARM
@@ -8,9 +8,12 @@
 
 #include "PCA9685RPi.h"
 
-namespace
+namespace PCA9685Constants
 {
-    const int TYPE_VECTOR = 6;
+    static const int TYPE_VECTOR = 6;
+
+    static const std::string RGB_ATTRIBUTE_NAME = "rgbValue";
+    static const std::string STATE_ATTRIBUTE_NAME = "state";
 }
 
 class PCA9685LEDResource
@@ -71,6 +74,13 @@ public:
      */
     std::string getUri();
 
+    /**
+     * @brief Set the RGB values manually
+     *
+     * @param values RGB values (Red, Green, Blue)
+     */
+    void setRGBValues(std::vector<int> values);
+
 private:
     /**
      * Resource object
@@ -120,4 +130,4 @@ private:
 };
 
 
-#endif /* LIGHTRESOURCE_H_ */
+#endif /* PCA9685LEDRESOURCE_H_ */

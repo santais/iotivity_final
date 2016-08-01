@@ -1,5 +1,5 @@
-#ifndef RPIRCSCONTROLLER_H
-#define RPIRCSCONTROLLER_H
+#ifndef RPIRCSCONTROLLER_H_
+#define RPIRCSCONTROLLER_H_
 
 #include "PCA9685LEDResource.h"
 #include "RPI7SegmentResource.h"
@@ -33,6 +33,29 @@ struct Callback<Ret(Params...)> {
 template <typename Ret, typename... Params>
 std::function<Ret(Params...)> Callback<Ret(Params...)>::func;
 
+/**
+ * @brief Controller FSM states.
+ */
+enum class ControllerState {
+    IDLE                   = 0,
+    AUTOMATIC_GAME_ON      = 1,
+    MANUAL_LED_CONTROL     = 2,
+    PLAY_LED_SEQUENCE      = 3
+};
+
+/**
+ * @brief Different available LED sequences
+ */
+enum class SequenceState {
+    IDLE         = 0,
+    BOWLING      = 1,
+    PULSE_UP     = 2,
+    COLOR_SHOW   = 3
+};
+
+/**
+ * @brief Private variables for RPIBeerPongController
+ */
 namespace
 {
     // 10 cups on each side + 1 for the water cleaner
@@ -53,8 +76,19 @@ namespace
     // I2C Address PWM Frequency HZ (24 - 1524 range)
     static const int I2C_FREQUENCY_HZ = 500;
 
+    // Const vector values
+    static const std::vector<int> CUP_OFF_RGB_VALUES = {0, 4095, 0};
+    static const std::vector<int> CUP_ON_RGB_VALUES  = {4095, 0, 0};
 
+    // URI
+    static const std::string CONTROLLER_URI = "/rpi/controller";
 
+    // Resource Type
+    static const std::string CONTROLLER_TYPE = "rpi.d.controller";
+
+    // Attributes
+    static const std::string STATE_NAME = "controllerState";
+    static const std::string SEQUENCE_NAME = "sequence";
 }
 
 class RPIBeerPongController
@@ -71,7 +105,18 @@ public:
 
     ~RPIBeerPongController();
 
+    /**
+     * @brief Get the current control state
+     *
+     * @return
+     */
+    ControllerState getControllerState();
+
 private:
+
+    // RCSRPIController resource to control controller state
+    RPIRCSResourceObject::Ptr m_resource;
+
     // Segment 7 Controller
     Segment7* m_segmentController;
 
@@ -81,6 +126,16 @@ private:
 
     // Vector which contains the 7segment display resources
     std::array<RPI7SegmentResource::Ptr, NUM_OF_SEGMENT_PAIRS> m_7SegmentResources;
+
+    /**
+     * @brief Current control state of the controller
+     */
+    ControllerState m_controllerState;
+
+    /**
+     * @brief Current Sequence state
+     */
+    SequenceState m_sequenceState;
 
 private:
     RPIBeerPongController();
@@ -96,6 +151,11 @@ private:
     void initializeSegmentResources();
 
     /**
+     * @brief Initialize the RPIResource object
+     */
+    void initializeRPIResource();
+
+    /**
      * @brief Callback initiated when a change to one of the input
      *        sensors are registered and the segment value is changed
      *
@@ -103,13 +163,35 @@ private:
      */
     void segmentCallback(Segment7* segment, uint16_t* inputData);
 
-    //static void staticCallback(Segment7* segment);
+    /**
+     * @brief setGameLEDLight
+     */
+    void setGameLEDLight(PCA9685LEDResource::Ptr, bool state);
 
+    /**
+     * @brief Handler to receive incoming POST requests
+     *
+     * @param request
+     * @param attr
+     */
+    void setRequestHandler(const RCSRequest &request, RCSResourceAttributes &attr);
+
+    /**
+     * @brief Set the attribute sof the m_resource object
+     */
+    void setAttributes();
+
+    /**
+     * @brief Set the control state
+     *
+     * @param state
+     * @param sequence
+     */
+    void setControlState(ControllerState state, SequenceState sequence);
 
 public:
     RPIBeerPongController(RPIBeerPongController const&)   = delete;   // No overloading allowed
     void operator=(RPIBeerPongController const&)     = delete;   // No assigning allowed
-
 
 };
 

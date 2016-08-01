@@ -1,5 +1,8 @@
 #include "PCA9685LEDResource.h"
 #include "resource_types.h"
+#include "RPIBeerPongController.h"
+
+using namespace PCA9685Constants;
 
 PCA9685LEDResource::PCA9685LEDResource() :
     m_uri("/pca9685led/0"),
@@ -136,6 +139,35 @@ std::string PCA9685LEDResource::getUri()
 }
 
 /**
+ * @brief Set the RGB values manually
+ *
+ * @param values RGB values (Red, Green, Blue)
+ */
+void PCA9685LEDResource::setRGBValues(std::vector<int> rgbValues)
+{
+    std::cout << "Entering: " << __func__ << std::endl;
+    if(rgbValues.size() < 2)
+    {
+        std::cerr << "Vector is too big. Only 3 values allowed" << std::endl;
+        return;
+    }
+
+    // Set the new attributes
+    RCSResourceAttributes::Value RCSValue(rgbValues);
+    m_resource->setAttribute(RGB_ATTRIBUTE_NAME, RCSValue);
+
+    // Overwrite local values
+    m_redLED.value   = rgbValues[0];
+    m_greenLED.value = rgbValues[1];
+    m_blueLED.value  = rgbValues[2];
+
+    // Set the physical outputs on the PCA9685 module
+    this->setPCA9685Outputs();
+
+    std::cout << "Leaving: " << __func__ << std::endl;
+}
+
+/**
  * @brief setRequestHandler
  *
  * @param request
@@ -145,26 +177,35 @@ void PCA9685LEDResource::setRequestHandler(const RCSRequest &request, RCSResourc
 {
     // Lookup the power attribute
     std:cout << "============================================ \n";
-    for(const auto &attr : attrs)
+    // Only set the outputs if the controller is in manual LED control state
+    if(RPIBeerPongController::getInstance()->getControllerState() != ControllerState::AUTOMATIC_GAME_ON)
     {
-        if(static_cast<int>(attr.value().getType().getId()) == TYPE_VECTOR)
+        for(const auto &attr : attrs)
         {
-            std::vector<int> rgbValues = attr.value().get<std::vector<int>>();
+            if(static_cast<int>(attr.value().getType().getId()) == TYPE_VECTOR)
+            {
+                std::vector<int> rgbValues = attr.value().get<std::vector<int>>();
 
-            // Insert new values into the PinOutput values
-            m_redLED.value   = rgbValues[0];
-            m_greenLED.value = rgbValues[1];
-            m_blueLED.value  = rgbValues[2];
+                // Insert new values into the PinOutput values
+                m_redLED.value   = rgbValues[0];
+                m_greenLED.value = rgbValues[1];
+                m_blueLED.value  = rgbValues[2];
 
-            std::cout << "Red Value: " << m_redLED.value << std::endl;
-            std::cout << "Green Value: " << m_greenLED.value << std::endl;
-            std::cout << "Blue Value: " << m_blueLED.value << std::endl;
+                std::cout << "Red Value: " << m_redLED.value << std::endl;
+                std::cout << "Green Value: " << m_greenLED.value << std::endl;
+                std::cout << "Blue Value: " << m_blueLED.value << std::endl;
+            }
         }
-    }
-    std::cout << "============================================ \n";
+        std::cout << "============================================ \n";
 
-    // Set the outputs
-    this->setPCA9685Outputs();
+        this->setPCA9685Outputs();
+    }
+    else
+    {
+        std::cerr << "Controller state is in AutomaticGameOn state and manual control is prohibited" << std::endl;
+
+        this->setAttributes();
+    }
 }
 
 
@@ -175,9 +216,9 @@ void PCA9685LEDResource::setAttributes()
 {
     const std::vector<int> LEDValues = {m_redLED.value, m_blueLED.value, m_greenLED.value};
     RCSResourceAttributes::Value value(LEDValues);
-    m_resource->addAttribute("rgbValue", value);
+    m_resource->addAttribute(RGB_ATTRIBUTE_NAME, value);
     value = RCSResourceAttributes::Value((bool) false);
-    m_resource->addAttribute("state", value);
+    m_resource->addAttribute(STATE_ATTRIBUTE_NAME, value);
 }
 
 
@@ -208,7 +249,7 @@ void PCA9685LEDResource::setPCA9685Outputs()
     std::cout << "Active I2CAddress for this module is: " << m_I2CAddress << std::endl;
 
     // Set the new pin values
-    static const int FREQ_RES_TEMP = 255;
+    static const int FREQ_RES_TEMP = 4095;//255;
     //  TODO: Replace FREQ_RES_TEMP with FREQUENCY_RESOLOTUION. Update APP
     //  To support 4096 resolution instead of 256
     // Red LED

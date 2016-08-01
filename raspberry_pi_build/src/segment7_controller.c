@@ -120,7 +120,7 @@ void sendDataToSegment(uint8_t* dataInput, uint8_t len)
  */
 void* inputThread()
 {
-	static uint8_t* dataInput = NULL;
+    //static uint8_t* dataInput = NULL;
 	static uint8_t* dataOutput = NULL;
 	static uint8_t bitCount = 0;
 	static Segment7* current = NULL;
@@ -139,8 +139,8 @@ void* inputThread()
 		newInputVal = 0;
 
 		// Read the current value
-        dataInput =  SN74HC165Read();
-        //pthread_mutex_lock(&m_mutex);	// DEBUG
+        //dataInput =  SN74HC165Read();
+        pthread_mutex_lock(&m_mutex);	// DEBUG
 
 		// Count the number of 1 bits and compare
 		// them with the current value.
@@ -158,7 +158,6 @@ void* inputThread()
 				current->value = bitCount;
 
 				// Announce the program which id changed
-                printf("Segment id: %i has changed and size: %i\n", current->id, sizeof(current));
                 m_callback(current, &inputBits);
 
 				// Announce new value
@@ -190,7 +189,7 @@ void* inputThread()
 			sendDataToSegment(dataOutput, m_numOfSegmentPairs);
 		}
 
-        //pthread_mutex_unlock(&m_mutex);	 // DEBUG
+        pthread_mutex_unlock(&m_mutex);	 // DEBUG
 		usleep(m_freq);
 	}
 
@@ -332,24 +331,31 @@ SN74HC595 get74HC595Obj()
  */
 void startSegment7()
 {
-	int resultCode = pthread_create(&m_pThread, NULL, inputThread, NULL);
+    if(!m_isRunning)
+    {
+        int resultCode = pthread_create(&m_pThread, NULL, inputThread, NULL);
 
-	if(resultCode != 0)
-	{
-		printf("Create pthread failed with result code: %i\n", resultCode);
-		return;
-	}
+        if(resultCode != 0)
+        {
+            printf("Create pthread failed with result code: %i\n", resultCode);
+            return;
+        }
 
-	// Detach thread from main thread
-	resultCode = pthread_detach(m_pThread);	
+        // Detach thread from main thread
+        resultCode = pthread_detach(m_pThread);
 
-	if(resultCode != 0)
-	{
-		printf("Unable to deatch thread. Result code: %i\n", resultCode);
-		return;
-	}
+        if(resultCode != 0)
+        {
+            printf("Unable to deatch thread. Result code: %i\n", resultCode);
+            return;
+        }
 
-	m_isRunning = 1;
+        m_isRunning = 1;
+    }
+    else
+    {
+        printf("Thread is already running!\n");
+    }
 }
 
 /**
