@@ -1,6 +1,11 @@
 
 #include "sn74hc595.h"
 
+#define SHIFT_REGISTER_BIT_SIZE 8
+
+#define SECONDS_TO_MICROSECONDS_MULTIPLIER 1000000
+#define DEFAULT_FREQUENCY_HZ            100000
+#define DEFAULT_FREQUENCY_PERIOD_MUS    (1/DEFAULT_FREQUENCY_HZ) * SECONDS_TO_MICROSECONDS_MULTIPLIER
 /****************************/
 /*    Private Variables     */
 /****************************/
@@ -12,31 +17,30 @@ static SN74HC595* m_activeSN74HC595 = NULL;
 /****************************/
 
 
-/**
- * @brief
- *
- * @param channel			Channel. Range [0,1]
- * @param speed 			Speed of the SPI interface
- * @param numOfRegisters 	Number of shift registers
- *
- * @return fileDescriptor
- */
-int SN74HC595Setup(uint8_t channel, SPIClockSpeed speed, uint8_t numOfShiftRegisters)
+void pulsePin(uint8_t pin)
 {
-	int clockSpeed = (int) speed;
-	SN74HC595Setup1(channel, clockSpeed, numOfShiftRegisters);
+#ifdef ARM
+	digitalWrite(pin, 0);
+	usleep(DEFAULT_FREQUENCY_PERIOD_MUS);
+	digitalWrite(pin, 1);
+	usleep(DEFAULT_FREQUENCY_PERIOD_MUS);
+#endif
 }
+
 
 /**
  * @brief
  *
- * @param channel			Channel. Range [0,1]
- * @param speed 			Speed of the SPI interface
- * @param numOfRegisters 	Number of shift registers
+ * @param clkPin                CLK Pin
+ * @param sclkEnPin             CLK INH Pin
+ * @param latchPin              SH/LD Pin
+ * @param dataPin               Data Pin
+ * @param numOfShiftRegister    Number of shift registers
  *
  * @return fileDescriptor
  */
-int SN74HC595Setup1(uint8_t channel, int speed, uint8_t numOfShiftRegisters)
+int SN74HC595Setup(const uint8_t clkPin, const uint8_t clkEnPin,
+                   const uint8_t dataPin, const uint8_t numOfShiftRegisters)
 {
 	if(m_activeSN74HC595 == NULL)
 	{
@@ -48,65 +52,60 @@ int SN74HC595Setup1(uint8_t channel, int speed, uint8_t numOfShiftRegisters)
 		}
 	}
 
-	m_activeSN74HC595->mode = 0;		// Default mode is 0
-	m_activeSN74HC595->channel &= 1; 	// Channel is either 0 or 1
-	m_activeSN74HC595->speed = speed;
+	m_activeSN74HC595->clkPin   		   = clkPin;
+	m_activeSN74HC595->clkEnPin 		   = clkEnPin;
+	m_activeSN74HC595->dataPin  		   = dataPin;
+	m_activeSN74HC595->numOfShiftRegisters = numOfShiftRegisters;
 
 #ifdef ARM
-	if ((m_activeSN74HC595->fileDescriptor = open (channel == 0 ? spiDev0 : spiDev1, O_RDWR)) < 0)
-	{
-		printf ("Unable to open SPI device: %s\n", strerror (errno));
-		return -1;
-	}
 
-	// Set SPI parameters.
-	if (ioctl (m_activeSN74HC595->fileDescriptor, SPI_IOC_WR_MODE, &m_activeSN74HC595->mode) < 0)
-	{
-		printf ("SPI Mode Change failure: %s\n", strerror (errno));
-		return -1;
-	}
+	
+	pinMode(clkPin, OUTPUT);
+	pinMode(clkEnPin, OUTPUT);
+	pinMode(dataPin, OUTPUT);
 
-	if (ioctl (m_activeSN74HC595->fileDescriptor, SPI_IOC_WR_BITS_PER_WORD, &spiBPW) < 0)
-	{
-		printf ("SPI BPW Change failure: %s\n", strerror (errno));
-		return -1;
-	}
+	// Set initial values
+	digitalWrite(clkPin, LOW);
+	digitalWrite(clkEnPin, LOW);
+	digitalWrite(dataPin, LOW);
 
-	if (ioctl (m_activeSN74HC595->fileDescriptor, SPI_IOC_WR_MAX_SPEED_HZ, &speed) < 0)
-	{
-		printf ("SPI Speed Change failure: %s\n", strerror (errno));
-		return -1;
-	}
 #endif
 
-	return m_activeSN74HC595->fileDescriptor;
+	return 1;
+
 }
 
 /**
- * @brief
+ * @brief Read the data from the 165. The number of bytes returned depends on numOfShiftRegisters registered
  *
- * @param data		Data to write to the SPI interface
- * @param len		Number of characters to write. Maximum is 4
- *
- * @return fileDescriptor
+ * @return Read Data
  */
-int SN74HC595ReadWrite(uint8_t *data, uint8_t len)
+int SN74HC595Write(uint8_t* data)
 {
-  	struct spi_ioc_transfer spi;
+    if(m_activeSN74HC595 == NULL)
+    {
+        printf ("SN74HC595 not setup. Call SN74HC165Setup first %s\n", strerror (errno));
+        return -1;
+    }
+#ifdef ARM
+	
+    printf("Number of shift registers: %i\n", m_activeSN74HC595->numOfShiftRegisters);
+    for(size_t i = 0; i < m_activeSN74HC595->numOfShiftRegisters; i++)
+    {
+	printf("Writing data: %#08x\n", data[i]);
+    	for(int bits = SHIFT_REGISTER_BIT_SIZE - 1; bits >= 0; bits--)
+    	{
+    		digitalWrite(m_activeSN74HC595->dataPin, data[i] & (1 << bits));
+		printf("Bit is: %i\n", data[i] & (1 << bits));
+    		pulsePin(m_activeSN74HC595->clkPin);
+    	}
+    }
 
-	// Mentioned in spidev.h but not used in the original kernel documentation
-	//	test program )-:
+    // Set the latch pin high to store the data
+    pulsePin(m_activeSN74HC595->clkEnPin);
 
-	memset (&spi, 0, sizeof (spi));
-
-	spi.tx_buf        = (unsigned long)data;
-	spi.rx_buf        = (unsigned long)data;
-	spi.len           = (int) len;
-	spi.delay_usecs   = spiDelay;
-	spi.speed_hz      = m_activeSN74HC595->speed;
-	spi.bits_per_word = spiBPW;
-
-	return ioctl (m_activeSN74HC595->fileDescriptor, SPI_IOC_MESSAGE(1), &spi) ;
+#endif
+    return 1;
 }
 
 /**

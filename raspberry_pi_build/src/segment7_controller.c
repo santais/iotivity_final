@@ -36,25 +36,26 @@ static uint8_t m_numOfSegmentPairs = 0;
 pthread_mutex_t m_mutex;
 
 // Test Data. DEBUG
-uint8_t dataInput[4] = {};
+uint8_t m_testData[4] = {};
+
 
 // 7 Segment Display List
 const static uint8_t m_segmentLookupTable[10] = {
-    0x3F,
-    0x06,
-    0x5B,
-    0x4F,
-    0x66,
-    0x6D,
-    0x7D,
-    0x07,
-    0x7F,
-    0x6F
+    0x40,
+    0xF9,
+    0x24,
+    0x30,
+    0x19,
+    0x12,
+    0x02,
+    0x78,
+    0x00,
+    0x10
 };
 
 
 /*********************/
-/* Private Functions */
+/* Private Funcitons */
 /*********************/
 
 /**
@@ -86,8 +87,10 @@ uint8_t* fragmentSegmentDigits(uint8_t dataInput)
 	// Size is 2 because the segments are in pairs
 	static uint8_t dataOutput[2] = {};
 
-    dataOutput[0] = m_segmentLookupTable[dataInput / 10];
-    dataOutput[1] = m_segmentLookupTable[dataInput % 10];
+	dataOutput[0] = m_segmentLookupTable[dataInput / 10];
+	dataOutput[1] = m_segmentLookupTable[dataInput % 10];
+
+	printf("dataOutput: %i %i \n", dataOutput[0], dataOutput[1]);
 
 	return dataOutput;
 }
@@ -111,7 +114,7 @@ void sendDataToSegment(uint8_t* dataInput, uint8_t len)
 	}
 
 	// Send the data to the SN74HC595 driver
-	printf("Return value of SPI Read is: %i\n", SN74HC595ReadWrite(dataOutput, len));
+	printf("Return value of SPI Read is: %i\n", SN74HC595Write(dataOutput));
 }
 
 /**
@@ -120,14 +123,13 @@ void sendDataToSegment(uint8_t* dataInput, uint8_t len)
  */
 void* inputThread()
 {
-    //static uint8_t* dataInput = NULL;
+	static uint8_t* dataInput = NULL;
 	static uint8_t* dataOutput = NULL;
 	static uint8_t bitCount = 0;
 	static Segment7* current = NULL;
 
 	// Used to announce when a change in the value occured
 	static uint8_t newInputVal = 0;
-    static uint8_t prevData[4] = {};
 
 	// Initialize the dataOutput
 	dataOutput = (uint8_t*) malloc(sizeof(uint8_t) * m_numOfSegmentPairs);
@@ -139,8 +141,8 @@ void* inputThread()
 		newInputVal = 0;
 
 		// Read the current value
-        //dataInput =  SN74HC165Read();
-        pthread_mutex_lock(&m_mutex);	// DEBUG
+		//dataInput =  SN74HC165Read();
+		pthread_mutex_lock(&m_mutex);	// DEBUG
 
 		// Count the number of 1 bits and compare
 		// them with the current value.
@@ -148,36 +150,25 @@ void* inputThread()
 		current = m_segment7;
 		while(current != NULL)
 		{
-            bitCount = hammingWeightBitCount(dataInput[current->shiftRegisterID1]) +
-                hammingWeightBitCount(dataInput[current->shiftRegisterID2] & INPUT_BITS_MASK);
-
-            uint16_t inputBits = (dataInput[current->shiftRegisterID2] << 8) | (dataInput[current->shiftRegisterID1] & 0xFF);
+			bitCount = hammingWeightBitCount(m_testData[current->shiftRegisterID1]) + 
+				hammingWeightBitCount(m_testData[current->shiftRegisterID2] & INPUT_BITS_MASK);
 
 			if(bitCount != current->value)
 			{
 				current->value = bitCount;
 
 				// Announce the program which id changed
-                m_callback(current, &inputBits);
+				m_callback(current);
 
 				// Announce new value
 				newInputVal = 1;
 			}
-            else if((dataInput[current->shiftRegisterID1] != prevData[current->shiftRegisterID1]) ||
-                    dataInput[current->shiftRegisterID2] != prevData[current->shiftRegisterID2])
-            {
-                m_callback(current, &inputBits);
-            }
 
 			// Used to segments ID to store the value
 			if(current->id < sizeof(dataOutput)) 
 			{
 				dataOutput[current->id] = current->value;
 			}
-
-            // OVerload previous value
-            prevData[current->shiftRegisterID1] = dataInput[current->shiftRegisterID1];
-            prevData[current->shiftRegisterID2] = dataInput[current->shiftRegisterID2];
 
 			current = current->next;
 		}
@@ -189,7 +180,7 @@ void* inputThread()
 			sendDataToSegment(dataOutput, m_numOfSegmentPairs);
 		}
 
-        pthread_mutex_unlock(&m_mutex);	 // DEBUG
+		pthread_mutex_unlock(&m_mutex);	 // DEBUG
 		usleep(m_freq);
 	}
 
@@ -252,7 +243,7 @@ int segment7Setup(uint8_t numOfSegmentPairs, SegmentValueCallback cb)
 	if(cb == NULL)
 	{
 		printf("Callback is null!\n");
-        return -1;
+		return -1;	
 	}
 
 	// Overwrite current callback
@@ -266,25 +257,26 @@ int segment7Setup(uint8_t numOfSegmentPairs, SegmentValueCallback cb)
 	// Initialize the segmen7 struct
 	if(initializeSegmentStruct(numOfSegmentPairs) <0 )
 	{
-        printf("Failed to initialize segment7 struct\n");
 		return -1;	
 	}
 
 	// Setup the SN74HC165 modules
-    if(SN74HC165Setup(SN74HC165_CLOCK_PIN, SN74HC165_CLOCK_EN_PIN, SN74HC165_LATCH_PIN,
+	if(SN74HC165Setup(SN74HC165_CLOCK_PIN, SN74HC165_CLOCK_EN_PIN, SN74HC165_LATCH_PIN,
 		SN74HC165_DATA_PIN, numOfSegmentPairs * 2) < 0)
 	{
 		printf("Unable to setup SN74HC165\n");
 		return -1;
 	}
 
-	if(SN74HC595Setup(SN74HC595_CE_CHANNEL, SN74HC595_CLOCK_SPEED, numOfSegmentPairs * 2) < 0)
+
+	if(SN74HC595Setup(SN74HC595_CLOCK_PIN, SN74HC595_CLOCK_EN_PIN, SN74HC595_DATA_PIN,
+		 numOfSegmentPairs * 2) < 0)
 	{
 		printf("Unable to setup SN74HC595\n");
 		return -1;
-    }
+	}
 
-    return 1;
+	return 1;
 }
 
 /**
@@ -331,31 +323,24 @@ SN74HC595 get74HC595Obj()
  */
 void startSegment7()
 {
-    if(!m_isRunning)
-    {
-        int resultCode = pthread_create(&m_pThread, NULL, inputThread, NULL);
+	int resultCode = pthread_create(&m_pThread, NULL, inputThread, NULL);
 
-        if(resultCode != 0)
-        {
-            printf("Create pthread failed with result code: %i\n", resultCode);
-            return;
-        }
+	if(resultCode != 0)
+	{
+		printf("Create pthread failed with result code: %i\n", resultCode);
+		return;
+	}
 
-        // Detach thread from main thread
-        resultCode = pthread_detach(m_pThread);
+	// Detach thread from main thread
+	resultCode = pthread_detach(m_pThread);	
 
-        if(resultCode != 0)
-        {
-            printf("Unable to deatch thread. Result code: %i\n", resultCode);
-            return;
-        }
+	if(resultCode != 0)
+	{
+		printf("Unable to deatch thread. Result code: %i\n", resultCode);
+		return;
+	}
 
-        m_isRunning = 1;
-    }
-    else
-    {
-        printf("Thread is already running!\n");
-    }
+	m_isRunning = 1;
 }
 
 /**
@@ -376,19 +361,10 @@ uint8_t getRunningStatus()
 
 void setTestData(uint8_t data[4])
 {
-    dataInput[0] = data[0];
-    dataInput[1] = data[1];
-    dataInput[2] = data[2];
-    dataInput[3] = data[3];
-}
-
-
-void acquireMutex()
-{
-    pthread_mutex_lock(&m_mutex);
-}
-
-void releaseMutex()
-{
-    pthread_mutex_unlock(&m_mutex);
+	pthread_mutex_lock(&m_mutex);
+	m_testData[0] = data[0];
+	m_testData[1] = data[1];
+	m_testData[2] = data[2];
+	m_testData[3] = data[3];
+	pthread_mutex_unlock(&m_mutex);
 }
