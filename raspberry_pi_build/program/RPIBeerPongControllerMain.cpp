@@ -3,6 +3,8 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include <thread>
+
 #include "OCPlatform.h"
 #include "OCApi.h"
 
@@ -30,20 +32,31 @@ void handleSigInt(int signum)
     }
 }
 
+void runOCThread()
+{
+    while(!g_quitFlag)
+    {
+        if(OCProcess() != OC_STACK_OK)
+        {
+            break;
+        }
+        usleep(10);
+    }
+}
+
 
 int main()
 {
     std::cout << "Starting test program" << std::endl;
     controller = RPIBeerPongController::Ptr(RPIBeerPongController::getInstance());
 
+    std::thread runThread(runOCThread);
+    runThread.detach();
+
     static char buffer[50] = {};
 
     while (!g_quitFlag)
     {
-        if(OCProcess() != OC_STACK_OK)
-        {
-            return 0;
-        }
 
         uint8_t data[4] = {};
         int len, val;
@@ -73,7 +86,9 @@ int main()
         setTestData(data);
         releaseMutex();
 
+        printf("After released mutex\n");
         usleep(FREQUENCY_MILLISECONDS);
+        printf("after usleep\n");
     }
 
 	return 0;
