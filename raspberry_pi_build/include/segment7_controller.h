@@ -32,21 +32,19 @@
 // is to be read
 #define INPUT_BITS_MASK 0x03
 
-// Static pin numbers. WiringPi configurations
-#define SN74HC165_CLOCK_PIN		0
-#define SN74HC165_CLOCK_EN_PIN 	        2
-#define SN74HC165_LATCH_PIN		3
-#define SN74HC165_DATA_PIN		12
+#define SN74HC165_CLOCK_PIN         0
+#define SN74HC165_CLOCK_EN_PIN      2
+#define SN74HC165_LATCH_PIN         3
+#define SN74HC165_DATA_PIN          12
 
-#define SN74HC595_CLOCK_PIN		23
+#define SN74HC595_CLOCK_PIN         23
 #define SN74HC595_CLOCK_EN_PIN		24
-#define SN74HC595_DATA_PIN		25
+#define SN74HC595_DATA_PIN          25
 
 #define HZ_TO_NANOSECONDS_MULTIPLIER 1000000000
 #define HZ_TO_MICROSECONDS_MULTIPLIER 1000000
 #define DEFAULT_FREQUENCY_HZ		 1
 
-// Clock speed of 
 
 typedef struct Segment7 {
 
@@ -71,7 +69,7 @@ typedef struct Segment7 {
  * @brief Callback definition called whenever a change in the
  *		  input is read and a new value of 7 segment is calculated
  */
-typedef void (*SegmentValueCallback)(Segment7* segment7);
+typedef void (*SegmentValueCallback)(Segment7* segment7, uint16_t *inputData);
 
 /**
  * @brief Setup tghe 7segment controller
@@ -117,6 +115,9 @@ void stopSegment7();
  * @brief Get the running status of the thread
  */
 uint8_t getRunningStatus();
+
+void acquireMutex();
+void releaseMutex();
 
 void setTestData(uint8_t data[4]);
 

@@ -10,6 +10,10 @@
 #ifndef _SN74HC595_H_
 #define _SN74HC595_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <errno.h>
 #include <stdlib.h>
