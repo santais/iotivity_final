@@ -32,7 +32,7 @@ elif target_arch in ['x86_64']:
 	env.AppendUnique(LINKFLAGS = ['-m64'])
 elif target_arch in ['arm'] or target_arch.find('v5') > 0:
 	env.AppendUnique(CPPFLAGS = ['-march=armv5te'])
-#elif target_arch in ['arm'] or  target_arch.find('v7a-hard') > 0:
+elif target_arch in ['arm'] or  target_arch.find('v7a-hard') > 0:
 	print '"""""""""""""'
 	print ' ARM V7a HARD' 
 	print '"""""""""""""'
