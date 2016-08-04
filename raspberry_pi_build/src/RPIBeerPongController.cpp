@@ -356,6 +356,8 @@ void RPIBeerPongController::setControlState(ControllerState state, SequenceState
         // Start the segment 7 driver
         std::cout << "Setting state to AUTOMATIC" << std::endl;
         startSegment7();
+
+	// Set all outputs to their correnspondeing state
         break;
 
     case ControllerState::MANUAL_LED_CONTROL:
