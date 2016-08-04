@@ -1,5 +1,7 @@
 #include "RPIBeerPongController.h"
 
+std::vector<int> DEFAULT_RGB_VALUE = {4095, 0, 0};
+
 
 RPIBeerPongController::RPIBeerPongController() : m_controllerState(ControllerState::AUTOMATIC_GAME_ON),
     m_sequenceState(SequenceState::BOWLING)
@@ -92,6 +94,7 @@ void RPIBeerPongController::initializeCupResources()
                      i*3 << " " << (i*3) + 1 << " " << (i*3) + 2 << std::endl;
 
         m_blueSideResources[i] = resource;
+        resource->setRGBValues(DEFAULT_RGB_VALUE);
     }
 
     for(size_t i = 0; i < 5; i++)
@@ -104,6 +107,7 @@ void RPIBeerPongController::initializeCupResources()
                      i*3 << " " << (i*3) + 1 << " " << (i*3) + 2 << std::endl;
 
         m_blueSideResources[i + 5] = resource;
+        resource->setRGBValues(DEFAULT_RGB_VALUE);
     }
 
     // Water Resource
@@ -123,6 +127,7 @@ void RPIBeerPongController::initializeCupResources()
                      i*3 << " " << (i*3) + 1 << " " << (i*3) + 2 << std::endl;
 
         m_redSideResources[i] = resource;
+	resource->setRGBValues(DEFAULT_RGB_VALUE);
     }
 
     for(size_t i = 0; i < 5; i++)
@@ -135,6 +140,7 @@ void RPIBeerPongController::initializeCupResources()
                      i*3 << " " << (i*3) + 1 << " " << (i*3) + 2 << std::endl;
 
         m_redSideResources[i + 5] = resource;
+	resource->setRGBValues(DEFAULT_RGB_VALUE);
     }
 
 

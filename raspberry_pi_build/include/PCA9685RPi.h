@@ -14,7 +14,6 @@
     extern "C" {
 #endif
 
-
 //#include <iostream>
 #include <stdio.h>
 #include <stdint.h>
@@ -53,7 +52,11 @@
 #define MODE1_SLEEP_MASK        0x10
 #define MODE1_WAKE_MASK         0xEF
 #define MODE1_RESTART_MASK      0x80
-#define MODE1_SETUP_MASK        0x7F
+#define MODE1_SETUP_MASK        0x6F
+
+#define MODE1_ALLCALL		0x01
+
+#define MODE2_OUTDRV		0x04
 
 #define LED_FULL_ON_OFF_MASK    0x10
 #define LED_FULL_NEGATED        0xEF
@@ -202,9 +205,9 @@ void PCA9685AllLEDsOff();
  * @return
  */
 PCA9685* getActivePCA9685Struct();
-  
+ 
 #ifdef __cplusplus
-}
+	}
 #endif
 
 #endif /* _PCA9685RPI_H_ */

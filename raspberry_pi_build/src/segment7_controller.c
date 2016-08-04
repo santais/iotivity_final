@@ -120,7 +120,7 @@ void sendDataToSegment(uint8_t* dataInput, uint8_t len)
  */
 void* inputThread()
 {
-	static uint8_t* dataInput = NULL;
+//	static uint8_t* dataInput = NULL;
 	static uint8_t* dataOutput = NULL;
 	static uint8_t bitCount = 0;
 	static Segment7* current = NULL;

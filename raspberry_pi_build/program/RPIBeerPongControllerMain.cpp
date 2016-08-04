@@ -48,10 +48,15 @@ void runOCThread()
 int main()
 {
     std::cout << "Starting test program" << std::endl;
+
+    wiringPiSetup();
+
     controller = RPIBeerPongController::Ptr(RPIBeerPongController::getInstance());
 
     std::thread runThread(runOCThread);
     runThread.detach();
+
+    std::cout << "Starting while loop" << std::endl;
 
     static char buffer[50] = {};
 
@@ -86,10 +91,11 @@ int main()
         setTestData(data);
         releaseMutex();
 
-        printf("After released mutex\n");
+     //   printf("After released mutex\n");
         usleep(FREQUENCY_MILLISECONDS);
-        printf("after usleep\n");
+     //   printf("after usleep\n");
     }
+	printf("Terminating program");
 
 	return 0;
 }

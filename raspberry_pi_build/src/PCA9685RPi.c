@@ -120,13 +120,24 @@ int PCA9685Setup(const uint8_t i2cAddress, uint16_t freq)
     // Setup the I2C Port
 #ifdef ARM
     m_activePCA9685->fileDescriptor = wiringPiI2CSetup(m_activePCA9685->i2cAddress);
-    // Read current settings and clear restart bit
+  
+    // Write to MODE 2
+    wiringPiI2CWriteReg8(m_activePCA9685->fileDescriptor, MODE2, MODE2_OUTDRV);
+
+    // Set ALLCALL to MODE 1
+    wiringPiI2CWriteReg8(m_activePCA9685->fileDescriptor, MODE1, MODE1_ALLCALL);
+    usleep(500);
+
+    // Read current settings and clear restart and sleep bit
     int settings = wiringPiI2CReadReg8(m_activePCA9685->fileDescriptor, MODE1) & MODE1_SETUP_MASK;
     // Enable auto increment
     settings |= MODE1_AR_MASK;
 
     // Write to the register
     wiringPiI2CWriteReg8(m_activePCA9685->fileDescriptor, MODE1, settings);
+
+    // Wait for the oscillator to stabilize
+    usleep(500);
 
     // Settup the frequency
     PCA9685SetFreq(m_activePCA9685->frequency);
@@ -214,10 +225,19 @@ void PCA9685SetPWMDC(uint8_t LEDPin, uint8_t dutyCycle)
     printf("Pin %i and duty cycle %i\n", LEDPin, dutyCycle);
 
     // Get lower and upper values
-    uint16_t onTime  = (FREQ_RESOLUTION * dutyCycle) / 100;
-    uint16_t offTime = FREQ_RESOLUTION - onTime;
+    uint16_t offTime = 0;
+    /*if(dutyCycle == 100)
+    {
+        offTime = FREQ_RESOLUTION - 2;
+    }
+    else
+    {*/
+        offTime  = ((FREQ_RESOLUTION - 1) * dutyCycle) / 100;
+    //}
 
-    PCA9685SetPWM(LEDPin, onTime, offTime);
+    uint16_t onTime = FREQ_RESOLUTION - onTime;
+
+    PCA9685SetPWM(LEDPin, 0, offTime);
 }
 
 /**
@@ -235,12 +255,16 @@ void PCA9685SetPWM(uint8_t LEDPin, uint16_t onTime, uint16_t offTime)
 #ifdef ARM
         // Calculate the on and off time and write to the registers
         uint8_t LEDRegisterVal = onTime & LED_L_MASK;               // LED_ON_L
+        printf("LED_ON_L: %i\n", LEDRegisterVal);
         wiringPiI2CWriteReg8(m_activePCA9685->fileDescriptor, LEDRegister, LEDRegisterVal);
         LEDRegisterVal = onTime >> LED_H_SHIFT_MASK;                // LED_ON_H
+	printf("LED_ON_H: %i\n", LEDRegisterVal);
         wiringPiI2CWriteReg8(m_activePCA9685->fileDescriptor, LEDRegister + 1, LEDRegisterVal);
         LEDRegisterVal = offTime & LED_L_MASK;                      // LED_OFF_L
+	printf("LED_OFF_L: %i\n", LEDRegisterVal);
         wiringPiI2CWriteReg8(m_activePCA9685->fileDescriptor, LEDRegister + 2, LEDRegisterVal);
-        LEDRegisterVal = offTime & LED_H_SHIFT_MASK;                // LED_OFF_H
+        LEDRegisterVal = offTime >> LED_H_SHIFT_MASK;                // LED_OFF_H
+	printf("LED_OFF_H: %i\n", LEDRegisterVal);
         wiringPiI2CWriteReg8(m_activePCA9685->fileDescriptor, LEDRegister + 3, LEDRegisterVal);
 
         // DEBUG
