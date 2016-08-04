@@ -7,7 +7,8 @@ using namespace PCA9685Constants;
 PCA9685LEDResource::PCA9685LEDResource() :
     m_uri("/pca9685led/0"),
     m_I2CAddress(64),
-    m_frequency(500)
+    m_frequency(500),
+    m_state(false)
 {}
 
 /**
@@ -19,7 +20,8 @@ PCA9685LEDResource::PCA9685LEDResource() :
 PCA9685LEDResource::PCA9685LEDResource(const std::string &uri, int i2cAddress, int frequnecy) :
     m_uri(uri),
     m_I2CAddress(i2cAddress),
-    m_frequency(frequnecy)
+    m_frequency(frequnecy),
+    m_state(false)
 {}
 
 PCA9685LEDResource::~PCA9685LEDResource()
@@ -168,6 +170,25 @@ void PCA9685LEDResource::setRGBValues(std::vector<int> rgbValues)
 }
 
 /**
+ * @brief getState
+ * @return
+ */
+bool PCA9685LEDResource::getState()
+{
+    return m_state;
+}
+
+
+/**
+ * @brief setState
+ * @param state
+ */
+void PCA9685LEDResource::setState(bool state)
+{
+    m_state = state;
+}
+
+/**
  * @brief setRequestHandler
  *
  * @param request
@@ -217,7 +238,7 @@ void PCA9685LEDResource::setAttributes()
     const std::vector<int> LEDValues = {m_redLED.value, m_blueLED.value, m_greenLED.value};
     RCSResourceAttributes::Value value(LEDValues);
     m_resource->addAttribute(RGB_ATTRIBUTE_NAME, value);
-    value = RCSResourceAttributes::Value((bool) false);
+    value = RCSResourceAttributes::Value(m_state);
     m_resource->addAttribute(STATE_ATTRIBUTE_NAME, value);
 }
 

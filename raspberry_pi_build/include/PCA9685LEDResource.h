@@ -81,6 +81,18 @@ public:
      */
     void setRGBValues(std::vector<int> values);
 
+    /**
+     * @brief getState
+     * @return
+     */
+    bool getState();
+
+    /**
+     * @brief setState
+     * @param state
+     */
+    void setState(bool state);
+
 private:
     /**
      * Resource object
@@ -108,6 +120,11 @@ private:
      * @brief frequency of the targeted i2c led driver
      */
     int m_frequency;
+
+    /**
+     * @brief State of the cup. ON/OFF
+     */
+    bool m_state;
 
 private:
     /**

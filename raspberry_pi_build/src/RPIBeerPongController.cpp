@@ -41,6 +41,8 @@ RPIBeerPongController::RPIBeerPongController() : m_controllerState(ControllerSta
 
     // Start the segment
     startSegment7();
+
+    setCupsAutomaticStateLight();
 }
 
 RPIBeerPongController* RPIBeerPongController::getInstance()
@@ -127,7 +129,7 @@ void RPIBeerPongController::initializeCupResources()
                      i*3 << " " << (i*3) + 1 << " " << (i*3) + 2 << std::endl;
 
         m_redSideResources[i] = resource;
-	resource->setRGBValues(DEFAULT_RGB_VALUE);
+        resource->setRGBValues(DEFAULT_RGB_VALUE);
     }
 
     for(size_t i = 0; i < 5; i++)
@@ -140,7 +142,7 @@ void RPIBeerPongController::initializeCupResources()
                      i*3 << " " << (i*3) + 1 << " " << (i*3) + 2 << std::endl;
 
         m_redSideResources[i + 5] = resource;
-	resource->setRGBValues(DEFAULT_RGB_VALUE);
+        resource->setRGBValues(DEFAULT_RGB_VALUE);
     }
 
 
@@ -258,8 +260,9 @@ void RPIBeerPongController::segmentCallback(Segment7* segment, uint16_t* inputDa
                 RCSResource->setAttribute("state", state);
                 RCSResource->notify();
 
-                // Set the RGB Values
+                // Set the RGB Values and local state
                 this->setGameLEDLight(PCA9685Resource, state);
+                PCA9685Resource->setState(state);
             }
         }
     }
@@ -278,6 +281,25 @@ void RPIBeerPongController::setGameLEDLight(PCA9685LEDResource::Ptr resource, bo
     else
     {
         resource->setRGBValues(CUP_OFF_RGB_VALUES);
+    }
+}
+
+
+/**
+ * @brief setCupsAutomaticStateLight
+ */
+void RPIBeerPongController::setCupsAutomaticStateLight()
+{
+    // Iterate over each light and set the light to its corresponding state
+    std::cout << "Im hereQ" << std::endl;
+    for(const auto& resource : m_redSideResources)
+    {
+        setGameLEDLight(resource, resource->getState());
+    }
+
+    for(const auto& resource : m_blueSideResources)
+    {
+        setGameLEDLight(resource, resource->getState());
     }
 }
 

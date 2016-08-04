@@ -166,7 +166,12 @@ private:
     /**
      * @brief setGameLEDLight
      */
-    void setGameLEDLight(PCA9685LEDResource::Ptr, bool state);
+    void setGameLEDLight(PCA9685LEDResource::Ptr resource, bool state);
+
+    /**
+     * @brief setCupsAutomaticStateLight
+     */
+    void setCupsAutomaticStateLight();
 
     /**
      * @brief Handler to receive incoming POST requests
